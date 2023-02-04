@@ -3,10 +3,13 @@
   font-size: 16px;
   line-height: 24px;
   font-weight: 400;
+  width: 100vw;
+  height: 100vh;
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
+  /* background-color: #353940; */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -19,9 +22,10 @@ body {
   width: 100vw;
   height: 100vh;
   margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+}
+
+
+@font-face {
+  font-family: 'RobotoLight';
+  src: url('./assets/fonts/Roboto-Light.ttf');
 }

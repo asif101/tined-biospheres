@@ -23,14 +23,13 @@ io.on('connection', (socket) => {
     console.log('a user disconnected')
   })
 
-  socket.on('ping', async () => {
-    sendLogToApp('pong console log')
-    socket.emit('pong')
-  })
-
   socket.on('countUnmoderatedImages', async (callback) => {
     const res = await getNumMetadata()
     callback(res)
+  })
+
+  socket.on('authenticate', (data, callback) => {
+    callback(authenticate(data))
   })
 })
 
@@ -47,4 +46,10 @@ function normalizePort(val) {
 
 function sendLogToApp(message) {
   io.emit('backendLog', message)
+}
+
+function authenticate({ username, password }) {
+  return true //for debugging
+  if (username === process.env.APP_USERNAME && password === process.env.APP_PASSWORD) return true
+  else return false
 }
