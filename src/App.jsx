@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import io from 'socket.io-client'
 import './App.css'
 
-const socket = io(':3000', { transports: ['websocket'] })
+const socket = io(import.meta.env.DEV ? ':3000' : null, { transports: ['websocket'] })
 
 export default function App() {
   const [count, setCount] = useState(0)
@@ -35,7 +35,7 @@ export default function App() {
 
   return (
     <div className="App">
-      <h1>Vite + React</h1>
+      <h1>Biospheres</h1>
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
         <div>
