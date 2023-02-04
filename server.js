@@ -1,9 +1,13 @@
-const express = require('express')
+import 'dotenv/config.js'
+import express from 'express'
+import http from 'http'
+import { Server } from 'socket.io'
+import { getNumMetadata } from './modules/db.js'
+
 const app = express()
-const http = require('http')
 const server = http.createServer(app)
-const { Server } = require('socket.io')
 const io = new Server(server)
+
 const port = normalizePort(process.env.PORT || '3000')
 app.set('port', port)
 
@@ -19,8 +23,14 @@ io.on('connection', (socket) => {
     console.log('a user disconnected')
   })
 
-  socket.on('ping', () => {
+  socket.on('ping', async () => {
+    sendLogToApp('pong console log')
     socket.emit('pong')
+  })
+
+  socket.on('countUnmoderatedImages', async (callback) => {
+    const res = await getNumMetadata()
+    callback(res)
   })
 })
 
@@ -33,4 +43,8 @@ function normalizePort(val) {
   if (isNaN(port)) return val
   if (port >= 0) return port
   return false
+}
+
+function sendLogToApp(message) {
+  io.emit('backendLog', message)
 }

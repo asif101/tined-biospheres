@@ -8,6 +8,7 @@ export default function App() {
   const [count, setCount] = useState(0)
   const [isConnected, setIsConnected] = useState(socket.connected)
   const [lastPong, setLastPong] = useState(null)
+  const [unmoderatedImageCount, setUnmoderatedImageCount] = useState(null)
 
   useEffect(() => {
     socket.on('connect', () => {
@@ -21,11 +22,13 @@ export default function App() {
     socket.on('pong', () => {
       setLastPong(new Date().toISOString())
     })
+    socket.on('backendLog', (m) => console.log(m))
 
     return () => {
       socket.off('connect')
       socket.off('disconnect')
       socket.off('pong')
+      socket.off('backendLog')
     }
   }, [])
 
@@ -42,6 +45,10 @@ export default function App() {
           <p>Connected: {'' + isConnected}</p>
           <p>Last pong: {lastPong || '-'}</p>
           <button onClick={sendPing}>Send ping</button>
+          <p>Number of unmoderated Images: {unmoderatedImageCount}</p>
+          <button onClick={() => socket.emit('countUnmoderatedImages', (val) => setUnmoderatedImageCount(val))}>
+            Count unmoderated images
+          </button>
         </div>
       </div>
     </div>

@@ -3,18 +3,24 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "concurrently -n APP,SERVER -c gray \"vite\" \"nodemon server\"",
+    "dev": "concurrently -n APP,SERVER -c gray \"vite\" \"nodemon server.js\"",
     "start": "node server",
     "build": "vite build",
     "preview": "vite preview"
   },
+  "type": "module",
   "dependencies": {
+    "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "luxon": "^3.2.1",
+    "pg": "^8.9.0",
+    "pg-format": "^1.0.4",
     "postcss-nesting": "^11.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "socket.io": "^4.5.4",
-    "socket.io-client": "^4.5.4"
+    "socket.io-client": "^4.5.4",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.26",
