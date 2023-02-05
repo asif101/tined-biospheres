@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import Sidebar from './Sidebar/Sidebar'
 import { mainViews } from '../../utils/enum'
+import Upload from './Upload/Upload'
+import Browser from './Browser/Browser'
 import './Main.css'
-import Upload from '../Upload/Upload'
 
 export default function Main() {
   const [mainView, setMainView] = useState(mainViews.MODERATE)
@@ -10,7 +11,10 @@ export default function Main() {
   return (
     <div className='main'>
       <Sidebar mainView={mainView} onMainViewChange={(v) => setMainView(v)} />
-      {mainView === mainViews.UPLOAD_TESTER && <Upload />}
+      <div className='content'>
+        {mainView === mainViews.IMAGE_BROWSER && <Browser />}
+        {mainView === mainViews.UPLOAD_TESTER && <Upload />}
+      </div>
     </div>
   )
 }

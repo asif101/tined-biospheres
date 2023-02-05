@@ -9,8 +9,10 @@ export default function App() {
   const socket = useSocket()
 
   useEffect(() => {
+    socket.on('connect', () => console.log('connected'))
     socket.on('backendLog', (m) => console.log(m))
     return () => {
+      socket.off('connect')
       socket.off('backendLog')
     }
   }, [])

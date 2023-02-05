@@ -8,6 +8,7 @@ const pool = new pg.Pool({
   user: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DATABASE,
+  max: 30
 })
 
 export async function getNumMetadata() {
@@ -53,6 +54,31 @@ export async function deleteMetadata(imageId) {
     const client = await pool.connect()
     await client.query(`delete from metadata where image_id='${imageId}'`)
     await client.release()
+  } catch (error) {
+    await client.release(true)
+    return error
+  }
+}
+
+export async function getNumImages() {
+  try {
+    const client = await pool.connect()
+    const res = await client.query('select count (*) from metadata')
+    await client.release()
+    return res.rows[0].count
+  } catch (error) {
+    await client.release(true)
+    return error
+  }
+}
+
+export async function getImages({page, imagesPerPage}) {
+  //TODO: needs filters
+  try {
+    const client = await pool.connect()
+    const res = await client.query(`select * from metadata order by created_timestamp desc offset ${(page - 1) * imagesPerPage} rows fetch next ${imagesPerPage} rows only`)
+    await client.release()
+    return res.rows
   } catch (error) {
     await client.release(true)
     return error

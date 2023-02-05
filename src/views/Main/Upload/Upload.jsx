@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { useSocket } from '../../utils/socketContext'
+import { useSocket } from '../../../utils/socketContext'
 import './Upload.css'
 
 export default function Upload() {
@@ -14,11 +14,9 @@ export default function Upload() {
 
   return (
     <div className='upload'>
-      <div className='inner'>
-        <div className='dropzone' {...getRootProps()}>
-          <input {...getInputProps()} />
-          <p>{isDragActive ? 'Drop the file here' : 'Drag image file here, or click to select file'}</p>
-        </div>
+      <div className='dropzone' {...getRootProps()}>
+        <input {...getInputProps()} />
+        <p>{isDragActive ? 'Drop the file here' : 'Drag image file here, or click to select file'}</p>
       </div>
     </div>
   )

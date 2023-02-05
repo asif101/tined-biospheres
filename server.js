@@ -2,7 +2,7 @@ import 'dotenv/config.js'
 import express from 'express'
 import http from 'http'
 import { Server } from 'socket.io'
-import { deleteMetadata, getNumMetadata, insertMetadata } from './modules/db.js'
+import { deleteMetadata, getImages, getNumImages, getNumMetadata, insertMetadata } from './modules/db.js'
 import { deleteFromS3, uploadToS3 } from './modules/s3.js'
 import { makeThumbnail } from './modules/image.js'
 import { v4 as uuidv4 } from 'uuid'
@@ -30,10 +30,28 @@ io.on('connection', (socket) => {
     callback(authenticate(data))
   })
   socket.on('fileUpload', (file, callback) => {
-    // console.log(file)
     uploadImage(file, { sessionId: uuidv4(), venue: 'Sydney', userName: 'Asif Rahman' })
       .then((imageId) => callback(true, `successfully added image with id ${imageId}`))
       .catch((e) => callback(false, e))
+  })
+  socket.on('getNumImages', (callback) => {
+    getNumImages()
+      .then((num) => {
+        callback(false, num)
+      })
+      .catch((e) => callback(e))
+  })
+  socket.on('getImages', (queryParams, callback) => {
+    getImages(queryParams)
+      .then((data) => {
+        callback(false, data)
+      })
+      .catch((e) => callback(e))
+  })
+  socket.on('deleteImage', (imageId, callback) => {
+    deleteImage(imageId)
+      .then((imageId) => callback(false, imageId))
+      .catch((e) => callback(e))
   })
 })
 
