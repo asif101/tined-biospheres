@@ -15,3 +15,15 @@
 // exports.decodeTimestamp = function (timestamp) {
 //   return new Date(timestamp * 1000)
 // }
+
+// export function makeMetadata(imageId, sessionId, venue, plantName, userName, createdTimestamp, moderationState ) {
+//   return {
+//     imageId,
+//     sessionId,
+//     venue,
+//     createdTimestamp,
+//     moderationState,
+//     plantName,
+//     userName
+//   }
+// }

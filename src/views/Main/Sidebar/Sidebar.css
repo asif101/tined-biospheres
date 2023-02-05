@@ -1,0 +1,17 @@
+.sidebar {
+  width: 25%;
+  max-width: 310px;
+  height: 100%;
+
+  & .MuiListItemButton-root {
+    margin: 5px;
+    border-radius: 15px;
+  }
+
+  & .Mui-selected {
+
+    & svg {
+      fill: #ffa726;
+    }
+  }
+}

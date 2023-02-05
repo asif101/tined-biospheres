@@ -42,7 +42,12 @@ export default function App() {
           }
         />
       )}
-      {isLoggedIn && <Main isSocketConnected={isConnected} />}
+      {isLoggedIn && (
+        <Main
+          isSocketConnected={isConnected}
+          onUpload={(f) => socket.emit('fileUpload', f[0], (res) => console.log(res))}
+        />
+      )}
     </div>
   )
 }

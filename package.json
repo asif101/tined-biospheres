@@ -12,7 +12,9 @@
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
+    "@mui/icons-material": "^5.11.0",
     "@mui/material": "^5.11.7",
+    "aws-sdk": "^2.1309.0",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "luxon": "^3.2.1",
@@ -21,6 +23,8 @@
     "postcss-nesting": "^11.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-dropzone": "^14.2.3",
+    "sharp": "^0.31.3",
     "socket.io": "^4.5.4",
     "socket.io-client": "^4.5.4",
     "uuid": "^9.0.0"
