@@ -1,6 +1,6 @@
 .sidebar {
-  width: 25%;
-  max-width: 310px;
+  width: 310px;
+  min-width: 310px;
   height: 100%;
 
   & .MuiListItemButton-root {
@@ -9,7 +9,6 @@
   }
 
   & .Mui-selected {
-
     & svg {
       fill: #ffa726;
     }
