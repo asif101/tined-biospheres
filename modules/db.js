@@ -84,3 +84,16 @@ export async function getImages({page, imagesPerPage}) {
     return error
   }
 }
+
+//moderationState should be either 0,1,2 (unmoderated, pass, fail)
+export async function setModeration(imageId, moderationState) {
+  try {
+    const client = await pool.connect()
+    const res = await client.query(`update metadata set moderation_state=${moderationState} where image_id='${imageId}'`)
+    await client.release()
+    return res.rows
+  } catch (error) {
+    await client.release(true)
+    return error
+  }
+}

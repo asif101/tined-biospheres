@@ -1,4 +1,4 @@
-import { Delete } from '@mui/icons-material'
+import { Check, Delete, DoNotDisturbAlt } from '@mui/icons-material'
 import {
   Button,
   Dialog,
@@ -8,7 +8,10 @@ import {
   DialogTitle,
   IconButton,
   Pagination,
+  ToggleButton,
+  ToggleButtonGroup,
 } from '@mui/material'
+import { DateTime } from 'luxon'
 import { useEffect, useState } from 'react'
 import { getThumbnailUrl } from '../../../utils/general'
 import { useSocket } from '../../../utils/socketContext'
@@ -43,10 +46,30 @@ export default function Browser() {
 
   return (
     <div className='browser'>
+      <div className='filters'>
       <p>{`Total Images: ${numImages}`}</p>
+      <p>All Times are in GMT</p>
+      </div>
       <div className='grid'>
         {images.map((x) => (
-          <ImageCard key={x.image_id} data={x} onDelete={() => setDialogOpen(x.image_id)} />
+          <ImageCard
+            key={x.image_id}
+            data={x}
+            onModerationChange={(imageId, moderationState) => {
+              socket.emit('updateModeration', imageId, moderationState, (e) => {
+                if (e) console.warn(e)
+                else {
+                  socket.emit('getImages', { page, imagesPerPage }, (e, data) => {
+                    if (e) console.warn(e)
+                    else {
+                      setImages(data)
+                    }
+                  })
+                }
+              })
+            }}
+            onDelete={() => setDialogOpen(x.image_id)}
+          />
         ))}
       </div>
       <Pagination
@@ -80,14 +103,36 @@ export default function Browser() {
   )
 }
 
-function ImageCard({ data, onDelete }) {
+function ImageCard({ data, onModerationChange, onDelete }) {
   return (
     <div className='image'>
-      <img src={getThumbnailUrl(data.image_id)} />
-      <span>{data.image_id}</span>
-      <IconButton onClick={() => onDelete(data.image_id)}>
-        <Delete />
-      </IconButton>
+      <div className='column'>
+        <img src={getThumbnailUrl(data.image_id)} />
+      </div>
+      <div className='column'>
+        <span>{DateTime.fromISO(data.created_timestamp).toUTC().toLocaleString(DateTime.DATETIME_MED)}</span>
+        <span>{data.venue}</span>
+        <div className='button-panel'>
+          <ToggleButtonGroup
+            size='small'
+            exclusive
+            value={data.moderation_state}
+            onChange={(e, v) => {
+              if (v) onModerationChange(data.image_id, v)
+            }}
+          >
+            <ToggleButton value={1}>
+              <Check />
+            </ToggleButton>
+            <ToggleButton value={2}>
+              <DoNotDisturbAlt />
+            </ToggleButton>
+          </ToggleButtonGroup>
+          <IconButton className='delete ' onClick={() => onDelete(data.image_id)}>
+            <Delete />
+          </IconButton>
+        </div>
+      </div>
     </div>
   )
 }

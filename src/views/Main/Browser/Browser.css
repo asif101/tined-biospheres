@@ -7,8 +7,16 @@
   flex-direction: column;
   align-items: center;
 
+  & > .filters {
+    width: calc(100% - 40px);
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+  }
+
   & > .grid {
     flex-grow: 1;
+    align-self: flex-start;
     margin: 10px;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
@@ -21,14 +29,43 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      padding: 5px 10px 5px 5px;
 
-      & > span {
-        text-align: center;
+      & > .column {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        &:last-child {
+          justify-content: space-around;
+        }
+
+        & > span {
+          font-size: 0.7rem;
+        }
+
+        & > .button-panel {
+          display: flex;
+
+          & .MuiToggleButton-root.Mui-selected {
+            & svg[data-testid='CheckIcon'] {
+              fill: #7ecd47;
+            }
+            & svg[data-testid='DoNotDisturbAltIcon'] {
+              fill: #dc3d32;
+            }
+          }
+
+          & > .delete {
+            margin-left: 4px;
+          }
+        }
       }
     }
   }
 
-  &>.MuiPagination-root {
+  & > .MuiPagination-root {
     margin: 10px 0;
   }
 }

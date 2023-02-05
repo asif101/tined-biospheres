@@ -2,7 +2,7 @@ import 'dotenv/config.js'
 import express from 'express'
 import http from 'http'
 import { Server } from 'socket.io'
-import { deleteMetadata, getImages, getNumImages, getNumMetadata, insertMetadata } from './modules/db.js'
+import { deleteMetadata, getImages, getNumImages, getNumMetadata, insertMetadata, setModeration } from './modules/db.js'
 import { deleteFromS3, uploadToS3 } from './modules/s3.js'
 import { makeThumbnail } from './modules/image.js'
 import { v4 as uuidv4 } from 'uuid'
@@ -52,6 +52,12 @@ io.on('connection', (socket) => {
     deleteImage(imageId)
       .then((imageId) => callback(false, imageId))
       .catch((e) => callback(e))
+  })
+
+  socket.on('updateModeration', (imageId, moderationState, callback) => {
+    setModeration(imageId, moderationState)
+      .then(() => callback(false))
+      .catch((e) => callback(true))
   })
 })
 
