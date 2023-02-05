@@ -1,31 +1,16 @@
 import { useState, useEffect } from 'react'
-import io from 'socket.io-client'
-import './App.css'
 import Login from './views/Login/Login'
 import Main from './views/Main/Main'
-
-const socket = io(import.meta.env.DEV ? ':3000' : null, { transports: ['websocket'] })
+import './App.css'
+import { useSocket } from './utils/socketContext'
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [isConnected, setIsConnected] = useState(socket.connected)
-  const [unmoderatedImageCount, setUnmoderatedImageCount] = useState(null)
+  const socket = useSocket()
 
   useEffect(() => {
-    socket.on('connect', () => {
-      setIsConnected(true)
-    })
-
-    socket.on('disconnect', () => {
-      setIsConnected(false)
-    })
-
     socket.on('backendLog', (m) => console.log(m))
-
     return () => {
-      socket.off('connect')
-      socket.off('disconnect')
-      socket.off('pong')
       socket.off('backendLog')
     }
   }, [])
@@ -42,12 +27,7 @@ export default function App() {
           }
         />
       )}
-      {isLoggedIn && (
-        <Main
-          isSocketConnected={isConnected}
-          onUpload={(f) => socket.emit('fileUpload', f[0], (res) => console.log(res))}
-        />
-      )}
+      {isLoggedIn && <Main />}
     </div>
   )
 }

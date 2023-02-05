@@ -1,13 +1,15 @@
 import { useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
+import { useSocket } from '../../utils/socketContext'
 import './Upload.css'
 
-export default function Upload({ onUpload }) {
+export default function Upload() {
+  const socket = useSocket()
+
   const onDrop = useCallback((acceptedFiles) => {
-    // Do something with the files
-    // console.log(acceptedFiles)
-    onUpload(acceptedFiles)
+    socket.emit('fileUpload', acceptedFiles[0], (res) => console.log(res))
   }, [])
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, maxFiles: 1 })
 
   return (

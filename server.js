@@ -32,8 +32,8 @@ io.on('connection', (socket) => {
   socket.on('fileUpload', (file, callback) => {
     // console.log(file)
     uploadImage(file, { sessionId: uuidv4(), venue: 'Sydney', userName: 'Asif Rahman' })
-      .then((imageId) => callback(`successfully added image with id ${imageId}`))
-      .catch((e) => sendLogToApp(e))
+      .then((imageId) => callback(true, `successfully added image with id ${imageId}`))
+      .catch((e) => callback(false, e))
   })
 })
 
