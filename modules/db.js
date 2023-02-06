@@ -94,3 +94,12 @@ export async function countUnmoderatedImages() {
     console.log(error)
   }
 }
+
+export async function getNextUnmoderatedImageMetadata() {
+  try {
+    const res = await pool.query('select * from metadata where moderation_state=0 order by created_timestamp limit 1')
+    return res.rows[0]
+  } catch (error) {
+    console.log(error)
+  }
+}

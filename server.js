@@ -10,6 +10,7 @@ import {
   countUnmoderatedImages,
   insertMetadata,
   setModeration,
+  getNextUnmoderatedImageMetadata,
 } from './modules/db.js'
 import { deleteFromS3, uploadToS3 } from './modules/s3.js'
 import { makeThumbnail } from './modules/image.js'
@@ -23,6 +24,8 @@ const upload = multer()
 const port = normalizePort(process.env.PORT || '3000')
 app.set('port', port)
 
+
+//REST Endpoints
 app.use(express.static('dist'))
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html')
@@ -33,6 +36,7 @@ app.post('/image', upload.single('image'), (req, res) => {
   res.sendStatus(200)
 })
 
+//Socketio Endpoints
 io.on('connection', (socket) => {
   console.log('app connected')
   socket.on('disconnect', () => console.log('app disconnected'))
@@ -40,6 +44,11 @@ io.on('connection', (socket) => {
     countUnmoderatedImages()
       .then((count) => callback(false, count))
       .catch((e) => callback(true))
+  })
+  socket.on('getNextMetadata', (callback) => {
+    getNextUnmoderatedImageMetadata()
+      .then((metadata) => callback(false, metadata))
+      .catch((e) => callback(e))
   })
   socket.on('authenticate', (data, callback) => {
     callback(authenticate(data))

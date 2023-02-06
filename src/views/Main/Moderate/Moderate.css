@@ -1,9 +1,63 @@
 .moderate {
-    width: calc(100% - 10px);
-    height: calc(100% - 10px);
-    background-color: rgb(41, 41, 41);
+  width: calc(100% - 10px);
+  height: calc(100% - 10px);
+  background-color: rgb(41, 41, 41);
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  & > .moderation-container {
+    width: calc(100% - 30px);
+    height: calc(100% - 30px);
+    background-color: rgb(51, 51, 51);
     border-radius: 15px;
     display: flex;
-    flex-direction: column;
-    align-items: center;
+
+    & > .column {
+      width: 70%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      /* align-items: center; */
+
+      &:last-child {
+        width: 30%;
+        justify-content: space-evenly;
+      }
+
+      & > .MuiSkeleton-root {
+        width: calc(100% - 10px);
+        height: 100%;
+      }
+
+      & > img {
+        width: calc(100% - 10px);
+        height: calc(100% - 10px);
+        aspect-ratio: 1;
+        object-fit: contain;
+        /* border: 1px solid salmon; */
+      }
+
+      & > .image-info {
+        width: 100%;
+
+        & > .info-item {
+          display: flex;
+          flex-direction: column;
+
+          & > .label {
+            font-size: 1.2rem;
+            font-family: 'RobotoBold';
+          }
+
+          & > .value {
+            font-family: 'RobotoLight';
+            margin-bottom: 12px;
+          }
+        }
+      }
+    }
+  }
 }
