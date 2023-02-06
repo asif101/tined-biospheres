@@ -8,7 +8,7 @@ import { LoadingButton } from '@mui/lab'
 import { CloudUpload, Check, Error } from '@mui/icons-material'
 import { v4 } from 'uuid'
 
-export default function Upload() {
+export default function Upload({ onUpload }) {
   const socket = useSocket()
 
   const [sessionId] = useState(v4())
@@ -78,6 +78,7 @@ export default function Upload() {
                       console.warn(e)
                     } else {
                       setUploadStatus('success')
+                      onUpload()
                     }
                   }
                 )

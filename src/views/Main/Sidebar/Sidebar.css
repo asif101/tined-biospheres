@@ -3,9 +3,13 @@
   min-width: 310px;
   height: 100%;
 
-  & .MuiListItemButton-root {
-    margin: 5px;
-    border-radius: 15px;
+  & > .MuiList-root {
+    padding-top: 0px;
+
+    & > .MuiListItemButton-root {
+      margin: 5px;
+      border-radius: 15px;
+    }
   }
 
   & .Mui-selected {

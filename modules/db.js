@@ -11,18 +11,6 @@ const pool = new pg.Pool({
   max: 30
 })
 
-export async function getNumMetadata() {
-  console.time('get')
-  try {
-    const res = await pool.query('select count (*) from metadata where moderation_state=0')
-    console.log(res.rows[0])
-    console.timeEnd('get')
-    return res.rows[0].count
-  } catch (error) {
-    console.log(error)
-  }
-}
-
 export async function insertMetadata(
   imageId,
   sessionId,
@@ -95,5 +83,14 @@ export async function setModeration(imageId, moderationState) {
   } catch (error) {
     await client.release(true)
     return error
+  }
+}
+
+export async function countUnmoderatedImages() {
+  try {
+    const res = await pool.query('select count (*) from metadata where moderation_state=0')
+    return res.rows[0].count
+  } catch (error) {
+    console.log(error)
   }
 }

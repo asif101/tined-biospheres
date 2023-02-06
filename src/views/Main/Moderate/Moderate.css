@@ -1,0 +1,9 @@
+.moderate {
+    width: calc(100% - 10px);
+    height: calc(100% - 10px);
+    background-color: rgb(41, 41, 41);
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}

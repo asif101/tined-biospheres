@@ -17,7 +17,7 @@ import { getThumbnailUrl } from '../../../utils/general'
 import { useSocket } from '../../../utils/socketContext'
 import './Browser.css'
 
-export default function Browser() {
+export default function Browser({ onModerationChange }) {
   const imagesPerPage = 25
 
   const socket = useSocket()
@@ -59,6 +59,7 @@ export default function Browser() {
               socket.emit('updateModeration', imageId, moderationState, (e) => {
                 if (e) console.warn(e)
                 else {
+                  onModerationChange()
                   socket.emit('getImages', { page, imagesPerPage }, (e, data) => {
                     if (e) console.warn(e)
                     else {

@@ -2,7 +2,15 @@ import 'dotenv/config.js'
 import express from 'express'
 import http from 'http'
 import { Server } from 'socket.io'
-import { deleteMetadata, getImages, getNumImages, getNumMetadata, insertMetadata, setModeration } from './modules/db.js'
+import multer from 'multer'
+import {
+  deleteMetadata,
+  getImages,
+  getNumImages,
+  countUnmoderatedImages,
+  insertMetadata,
+  setModeration,
+} from './modules/db.js'
 import { deleteFromS3, uploadToS3 } from './modules/s3.js'
 import { makeThumbnail } from './modules/image.js'
 import { v4 as uuidv4 } from 'uuid'
@@ -10,6 +18,7 @@ import { v4 as uuidv4 } from 'uuid'
 const app = express()
 const server = http.createServer(app)
 const io = new Server(server, { maxHttpBufferSize: 1e8 })
+const upload = multer()
 
 const port = normalizePort(process.env.PORT || '3000')
 app.set('port', port)
@@ -19,12 +28,18 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html')
 })
 
+app.post('/image', upload.single('image'), (req, res) => {
+  console.log(req.body)
+  res.sendStatus(200)
+})
+
 io.on('connection', (socket) => {
   console.log('app connected')
   socket.on('disconnect', () => console.log('app disconnected'))
-  socket.on('countUnmoderatedImages', async (callback) => {
-    const res = await getNumMetadata()
-    callback(res)
+  socket.on('countUnmoderatedImages', (callback) => {
+    countUnmoderatedImages()
+      .then((count) => callback(false, count))
+      .catch((e) => callback(true))
   })
   socket.on('authenticate', (data, callback) => {
     callback(authenticate(data))
