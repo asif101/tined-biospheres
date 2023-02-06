@@ -63,14 +63,24 @@ export default function Upload() {
               onClick={() => {
                 if (uploadStatus === 'success' || uploadStatus === 'error') return
                 setUploadStatus('loading')
-                socket.emit('fileUpload', file.file, { sessionId, venue, userName, plantName }, (e) => {
-                  if (e) {
-                    setUploadStatus('error')
-                    console.warn(e)
-                  } else {
-                    setUploadStatus('success')
+                socket.emit(
+                  'fileUpload',
+                  file.file,
+                  {
+                    sessionId,
+                    venue,
+                    userName: userName !== '' ? userName : undefined,
+                    plantName: plantName !== '' ? plantName : undefined,
+                  },
+                  (e) => {
+                    if (e) {
+                      setUploadStatus('error')
+                      console.warn(e)
+                    } else {
+                      setUploadStatus('success')
+                    }
                   }
-                })
+                )
               }}
               loading={uploadStatus === 'loading'}
             >
