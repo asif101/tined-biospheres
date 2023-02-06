@@ -68,7 +68,6 @@ export default function Upload() {
                     setUploadStatus('error')
                     console.warn(e)
                   } else {
-                    console.log('upload success')
                     setUploadStatus('success')
                   }
                 })

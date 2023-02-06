@@ -47,8 +47,8 @@ export default function Browser() {
   return (
     <div className='browser'>
       <div className='filters'>
-      <p>{`Total Images: ${numImages}`}</p>
-      <p>All Times are in GMT</p>
+        <p>{`Total Images: ${numImages}`}</p>
+        <p>All Times are in GMT</p>
       </div>
       <div className='grid'>
         {images.map((x) => (
@@ -92,7 +92,21 @@ export default function Browser() {
           <Button
             color='error'
             onClick={() => {
-              socket.emit('deleteImage', dialogOpen, () => setDialogOpen(false))
+              socket.emit('deleteImage', dialogOpen, () => {
+                socket.emit('getNumImages', (e, num) => {
+                  if (e) console.warn(e)
+                  else {
+                    setNumImages(num)
+                    socket.emit('getImages', { page, imagesPerPage }, (e, data) => {
+                      if (e) console.warn(e)
+                      else {
+                        setImages(data)
+                        setDialogOpen(false)
+                      }
+                    })
+                  }
+                })
+              })
             }}
           >
             Confirm
