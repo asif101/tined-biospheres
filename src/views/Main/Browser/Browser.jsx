@@ -105,7 +105,7 @@ export default function Browser() {
 
 function ImageCard({ data, onModerationChange, onDelete }) {
   return (
-    <div className='image'>
+    <div className='image-card'>
       <div className='column'>
         <img src={getThumbnailUrl(data.image_id)} />
       </div>

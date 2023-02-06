@@ -16,14 +16,32 @@
 
   & > .grid {
     flex-grow: 1;
-    align-self: flex-start;
+    width: calc(100% - 20px);
     margin: 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    align-self: flex-start;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
     gap: 4px;
+    @media (max-width: 1540px) {
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    }
+    @media (max-width: 1300px) {
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    }
+    /* display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start; */
 
-    & > .image {
+
+    & > .image-card {
+      /* width: 238px;
+      height: 148px;
+      margin: 4px; */
       background-color: rgb(51, 51, 51);
       border-radius: 15px;
       display: flex;
@@ -32,13 +50,19 @@
       padding: 5px 10px 5px 5px;
 
       & > .column {
+        width: 50%;
         height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: center;
 
         &:last-child {
-          justify-content: space-around;
+          justify-content: space-between;
+        }
+
+        &>img {
+          width: 90%;
+          aspect-ratio: 1;
         }
 
         & > span {
@@ -46,7 +70,9 @@
         }
 
         & > .button-panel {
+          width: 100%;
           display: flex;
+          justify-content: center;
 
           & .MuiToggleButton-root.Mui-selected {
             & svg[data-testid='CheckIcon'] {

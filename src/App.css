@@ -6,13 +6,18 @@
   justify-content: center;
   align-items: center;
 
-  & > h1 {
-    font-family: 'RobotoLight';
-    color: white;
-    font-size: 2.5rem;
-    letter-spacing: 5px;
-    margin-left: 20px;
+  & > .header {
     width: calc(100% - 20px);
-    font-weight: 100;
+    margin: 0 0 0 20px;
+    height: 78px;
+    display: flex;
+    align-items: center;
+    & > span {
+      font-family: 'RobotoLight';
+      color: white;
+      font-size: 2.5rem;
+      letter-spacing: 5px;
+      font-weight: 100;
+    }
   }
 }

@@ -19,7 +19,9 @@ export default function App() {
 
   return (
     <div className='app'>
-      <h1>BIOSPHERES</h1>
+      <div className='header'>
+        <span>BIOSPHERES</span>
+      </div>
       {!isLoggedIn && (
         <Login
           onLogin={(username, password) =>
