@@ -29,10 +29,10 @@ io.on('connection', (socket) => {
   socket.on('authenticate', (data, callback) => {
     callback(authenticate(data))
   })
-  socket.on('fileUpload', (file, callback) => {
-    uploadImage(file, { sessionId: uuidv4(), venue: 'Sydney', userName: 'Asif Rahman' })
-      .then((imageId) => callback(true, `successfully added image with id ${imageId}`))
-      .catch((e) => callback(false, e))
+  socket.on('fileUpload', (file, metadata, callback) => {
+    uploadImage(file, metadata)
+      .then((imageId) => callback(false, `successfully added image with id ${imageId}`))
+      .catch((e) => callback(e))
   })
   socket.on('getNumImages', (callback) => {
     getNumImages()
