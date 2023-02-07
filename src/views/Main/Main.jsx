@@ -33,7 +33,9 @@ export default function Main() {
         unmoderatedImageCount={unmoderatedImageCount}
       />
       <div className='content'>
-        {mainView === mainViews.MODERATE && <Moderate onModerationChange={refreshUnmoderatedImageCount} />}
+        {mainView === mainViews.MODERATE && (
+          <Moderate onModerationChange={refreshUnmoderatedImageCount} unmoderatedImageCount={unmoderatedImageCount} />
+        )}
         {mainView === mainViews.IMAGE_BROWSER && <Browser onModerationChange={refreshUnmoderatedImageCount} />}
         {mainView === mainViews.UPLOAD_TESTER && <Upload onUpload={refreshUnmoderatedImageCount} />}
       </div>

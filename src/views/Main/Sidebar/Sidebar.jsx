@@ -9,7 +9,7 @@ export default function Sidebar({ mainView, onMainViewChange, unmoderatedImageCo
       <List>
         <ListItemButton selected={mainView === mainViews.MODERATE} onClick={() => onMainViewChange(mainViews.MODERATE)}>
           <ListItemIcon>
-            <Badge badgeContent={unmoderatedImageCount} color='error' max={999}>
+            <Badge badgeContent={unmoderatedImageCount} color='error' max={999} invisible={unmoderatedImageCount < 1}>
               <Inbox />
             </Badge>
           </ListItemIcon>
