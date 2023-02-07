@@ -3,7 +3,7 @@ import { DateTime } from 'luxon'
 import { getThumbnailUrl, getImageUrl } from '../../../utils/general'
 import { useSocket } from '../../../utils/socketContext'
 import './Moderate.css'
-import { ToggleButton, ToggleButtonGroup } from '@mui/material'
+import { Skeleton, ToggleButton, ToggleButtonGroup } from '@mui/material'
 import { Check, DoNotDisturbAlt, Inbox } from '@mui/icons-material'
 import { AnimatePresence, motion } from 'framer-motion'
 
@@ -11,6 +11,7 @@ export default function Moderate({ onModerationChange, unmoderatedImageCount }) 
   const socket = useSocket()
 
   const [metadata, setMetadata] = useState()
+  const [imageLoaded, setImageLoaded] = useState(false)
 
   useEffect(() => {
     getNextMetadata()
@@ -18,9 +19,10 @@ export default function Moderate({ onModerationChange, unmoderatedImageCount }) 
 
   function getNextMetadata() {
     socket.emit('getNextMetadata', (e, metadata) => {
-    //   console.log(metadata)
+      //   console.log(metadata)
       if (e) console.warn(e)
       else {
+        setImageLoaded(false)
         setMetadata(metadata)
       }
     })
@@ -43,8 +45,10 @@ export default function Moderate({ onModerationChange, unmoderatedImageCount }) 
           >
             <div className='column'>
               <img
+                style={{ opacity: imageLoaded ? 1 : 0 }}
                 // src={getThumbnailUrl(metadata.image_id)}
-                  src={getImageUrl(metadata.image_id)}
+                src={getImageUrl(metadata.image_id)}
+                onLoad={() => setImageLoaded(true)}
               />
             </div>
             <div className='column'>

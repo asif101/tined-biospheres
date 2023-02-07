@@ -26,7 +26,8 @@ export default function App() {
         <Login
           onLogin={(username, password) =>
             socket.emit('authenticate', { username, password }, (auth) => {
-              setIsLoggedIn(auth)
+              if(!auth) console.warn('login failed')
+              else setIsLoggedIn(auth)
             })
           }
         />
