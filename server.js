@@ -11,6 +11,7 @@ import {
   insertMetadata,
   setModeration,
   getNextUnmoderatedImageMetadata,
+  getLatestImages,
 } from './modules/db.js'
 import { deleteFromS3, uploadToS3 } from './modules/s3.js'
 import { makeThumbnail } from './modules/image.js'
@@ -29,6 +30,24 @@ app.set('port', port)
 
 //REST Endpoints
 app.use(express.static('dist'))
+
+app.get('/latestImages', upload.none(), (req, res) => {
+  const e = validateRequest(req)
+  if (e) {
+    console.log('rejected latestImages GET request with reason:', e)
+    res.status(400).send(e)
+  } else {
+    getLatestImages(49, req.body.venue, 0.3)
+      .then((ids) => res.status(200).send(ids))
+      .catch((e) => res.status(500).send(e))
+  }
+  function validateRequest(req) {
+    if (req.body?.token !== process.env.API_TOKEN) return 'invalid token'
+    if (!Object.values(venues).includes(req.body.venue)) return 'Venue is not valid'
+    return false
+  }
+})
+
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html')
 })

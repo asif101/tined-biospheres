@@ -92,6 +92,7 @@ export async function countUnmoderatedImages() {
     return res.rows[0].count
   } catch (error) {
     console.log(error)
+    return error
   }
 }
 
@@ -101,5 +102,20 @@ export async function getNextUnmoderatedImageMetadata() {
     return res.rows[0]
   } catch (error) {
     console.log(error)
+    return error
+  }
+}
+
+//get latest images, split between global and venue 
+export async function getLatestImages(numImages, venue, venueSplit) {
+  try {
+    const numVenueImages = Math.round(numImages * venueSplit)
+    const venueImages = await pool.query(`select image_id from metadata where venue='${venue}' and moderation_state=1 order by created_timestamp desc limit ${numVenueImages}`)
+    const numGlobalImages = numImages - venueImages.rows.length
+    const globalImages = await pool.query(`select image_id from metadata where venue!='${venue}' and moderation_state=1 order by created_timestamp desc limit ${numGlobalImages}`)
+    return [...venueImages.rows, ...globalImages.rows].map(x => x.image_id)
+  } catch (error) {
+    console.log(error)
+    return error
   }
 }
