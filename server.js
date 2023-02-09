@@ -17,6 +17,8 @@ import { makeThumbnail } from './modules/image.js'
 import { v4 as uuidv4 } from 'uuid'
 import { venues } from './src/utils/enum.js'
 
+const debug = false
+
 const app = express()
 const server = http.createServer(app)
 const io = new Server(server, { maxHttpBufferSize: 1e8 })
@@ -125,7 +127,7 @@ function sendLogToApp(message) {
 }
 
 function authenticate({ username, password }) {
-  return true //for debugging
+  if (debug) return true
   if (username === process.env.APP_USERNAME && password === process.env.APP_PASSWORD) return true
   else return false
 }
