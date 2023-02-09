@@ -3,7 +3,7 @@ import { DateTime } from 'luxon'
 import { getThumbnailUrl, getImageUrl } from '../../../utils/general'
 import { useSocket } from '../../../utils/socketContext'
 import './Moderate.css'
-import { Skeleton, ToggleButton, ToggleButtonGroup } from '@mui/material'
+import { CircularProgress, Skeleton, ToggleButton, ToggleButtonGroup } from '@mui/material'
 import { Check, DoNotDisturbAlt, Inbox } from '@mui/icons-material'
 import { AnimatePresence, motion } from 'framer-motion'
 
@@ -14,15 +14,18 @@ export default function Moderate({ onModerationChange, unmoderatedImageCount }) 
   const [imageLoaded, setImageLoaded] = useState(false)
 
   useEffect(() => {
-    getNextMetadata()
+    getNextMetadata(true)
   }, [])
 
-  function getNextMetadata() {
+  useEffect(() => {
+    getNextMetadata()
+  }, [unmoderatedImageCount])
+
+  function getNextMetadata(resetImageLoaded) {
     socket.emit('getNextMetadata', (e, metadata) => {
-      //   console.log(metadata)
       if (e) console.warn(e)
       else {
-        setImageLoaded(false)
+        if (resetImageLoaded) setImageLoaded(false)
         setMetadata(metadata)
       }
     })
@@ -44,6 +47,7 @@ export default function Moderate({ onModerationChange, unmoderatedImageCount }) 
             }}
           >
             <div className='column'>
+              <CircularProgress color='warning' style={{ opacity: imageLoaded ? 0 : 1 }}/>
               <img
                 style={{ opacity: imageLoaded ? 1 : 0 }}
                 // src={getThumbnailUrl(metadata.image_id)}
@@ -81,7 +85,7 @@ export default function Moderate({ onModerationChange, unmoderatedImageCount }) 
                       if (e) console.warn(e)
                       else {
                         onModerationChange()
-                        getNextMetadata()
+                        getNextMetadata(true)
                       }
                     })
                   }}

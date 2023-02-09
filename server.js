@@ -15,6 +15,7 @@ import {
 import { deleteFromS3, uploadToS3 } from './modules/s3.js'
 import { makeThumbnail } from './modules/image.js'
 import { v4 as uuidv4 } from 'uuid'
+import { venues } from './src/utils/enum.js'
 
 const app = express()
 const server = http.createServer(app)
@@ -24,7 +25,6 @@ const upload = multer()
 const port = normalizePort(process.env.PORT || '3000')
 app.set('port', port)
 
-
 //REST Endpoints
 app.use(express.static('dist'))
 app.get('/', (req, res) => {
@@ -32,8 +32,32 @@ app.get('/', (req, res) => {
 })
 
 app.post('/image', upload.single('image'), (req, res) => {
-  console.log(req.body)
-  res.sendStatus(200)
+  const e = validateRequest(req)
+  if (e) {
+    console.log('rejected image POST request with reason:', e)
+    res.status(400).send(e)
+  } else {
+    uploadImage(req.file.buffer, {
+      sessionId: req.body.sessionId,
+      venue: req.body.venue,
+      plantName: req.body?.plantName !== '' ? req.body?.plantName : undefined,
+      userName: req.body?.userName !== '' ? req.body?.userName : undefined,
+    })
+      .then((imageId) => {
+        io.emit('newImage')
+        res.status(200).send(`successfully added image with id ${imageId}`)
+      })
+      .catch((e) => res.status(500).send(e))
+  }
+
+  function validateRequest(req) {
+    if (req.body?.token !== process.env.API_TOKEN) return 'invalid token'
+    if (!Object.values(venues).includes(req.body.venue)) return 'Venue is not valid'
+    if (!req.body.sessionId) return 'sessionId is a required field'
+    if (req?.file?.mimetype !== 'image/png') return 'invalid image type. only png is allowed'
+    if (req?.file?.size > 11000000) return 'image too large. max size is 10MB'
+    return false
+  }
 })
 
 //Socketio Endpoints

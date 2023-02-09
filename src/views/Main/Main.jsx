@@ -15,6 +15,10 @@ export default function Main() {
 
   useEffect(() => {
     refreshUnmoderatedImageCount()
+    socket.on('newImage', () => refreshUnmoderatedImageCount())
+    return () => {
+      socket.off('newImage')
+    }
   }, [])
 
   const refreshUnmoderatedImageCount = () => {
