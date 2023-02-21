@@ -110,10 +110,10 @@ export async function getNextUnmoderatedImageMetadata() {
 export async function getLatestImages(numImages, venue, venueSplit) {
   try {
     const numVenueImages = Math.round(numImages * venueSplit)
-    const venueImages = await pool.query(`select image_id from metadata where venue='${venue}' and moderation_state=1 order by created_timestamp desc limit ${numVenueImages}`)
+    const venueImages = await pool.query(`select * from metadata where venue='${venue}' and moderation_state=1 order by created_timestamp desc limit ${numVenueImages}`)
     const numGlobalImages = numImages - venueImages.rows.length
-    const globalImages = await pool.query(`select image_id from metadata where venue!='${venue}' and moderation_state=1 order by created_timestamp desc limit ${numGlobalImages}`)
-    return [...venueImages.rows, ...globalImages.rows].map(x => x.image_id)
+    const globalImages = await pool.query(`select * from metadata where venue!='${venue}' and moderation_state=1 order by created_timestamp desc limit ${numGlobalImages}`)
+    return [...venueImages.rows, ...globalImages.rows]
   } catch (error) {
     console.log(error)
     return error
