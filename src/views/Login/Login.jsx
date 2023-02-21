@@ -1,12 +1,21 @@
 import { Button, TextField } from '@mui/material'
 import { useState } from 'react'
+import { useSocket } from '../../utils/socketContext'
 import './Login.css'
 
-export default function Login({ onLogin }) {
+export default function Login({ onLoginSuccess }) {
+  const socket = useSocket()
+
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState(false)
 
-  const login = () => onLogin(username, password)
+  const login = () => {
+    socket.emit('authenticate', { username, password }, (auth) => {
+      if (!auth) setError(true)
+      else onLoginSuccess()
+    })
+  }
 
   return (
     <div className='login'>
@@ -14,7 +23,11 @@ export default function Login({ onLogin }) {
         label='Username'
         color='warning'
         value={username}
-        onChange={(e) => setUsername(e.target.value)}
+        error={error}
+        onChange={(e) => {
+          if (error) setError(false)
+          setUsername(e.target.value)
+        }}
         onKeyDown={(e) => {
           if (e.key === 'Enter') login()
         }}
@@ -24,7 +37,12 @@ export default function Login({ onLogin }) {
         color='warning'
         value={password}
         type='password'
-        onChange={(e) => setPassword(e.target.value)}
+        error={error}
+        helperText={error ? 'Incorrect Username/Password' : ' '}
+        onChange={(e) => {
+          if (error) setError(false)
+          setPassword(e.target.value)
+        }}
         onKeyDown={(e) => {
           if (e.key === 'Enter') login()
         }}
