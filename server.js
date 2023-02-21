@@ -31,7 +31,7 @@ app.set('port', port)
 //REST Endpoints
 app.use(express.static('dist'))
 
-app.get('/latestImages', upload.none(), (req, res) => {
+app.post('/latestImages', upload.none(), (req, res) => {
   const e = validateRequest(req)
   if (e) {
     console.log('rejected latestImages GET request with reason:', e)
