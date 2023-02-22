@@ -34,7 +34,7 @@ app.use(express.static('dist'))
 app.post('/latestImages', upload.none(), (req, res) => {
   const e = validateRequest(req)
   if (e) {
-    console.log('rejected latestImages GET request with reason:', e)
+    console.log('rejected latestImages POST request with reason:', e)
     res.status(400).send(e)
   } else {
     getLatestImages(49, req.body.venue, 0.3)
@@ -42,6 +42,7 @@ app.post('/latestImages', upload.none(), (req, res) => {
       .catch((e) => res.status(500).send(e))
   }
   function validateRequest(req) {
+    if (!req.body) return 'no request body'
     if (req.body?.token !== process.env.API_TOKEN) return 'invalid token'
     if (!Object.values(venues).includes(req.body.venue)) return 'Venue is not valid'
     return false
@@ -72,6 +73,7 @@ app.post('/image', upload.single('image'), (req, res) => {
   }
 
   function validateRequest(req) {
+    if (!req.body) return 'no request body'
     if (req.body?.token !== process.env.API_TOKEN) return 'invalid token'
     if (!Object.values(venues).includes(req.body.venue)) return 'Venue is not valid'
     if (!req.body.sessionId) return 'sessionId is a required field'
