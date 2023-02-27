@@ -119,3 +119,13 @@ export async function getLatestImages(numImages, venue, venueSplit) {
     return error
   }
 }
+
+export async function getCredentialsFromUsername(username) {
+  try {
+    const res = await pool.query(`select * from users where name='${username}'`)
+    return res.rows[0]
+  } catch (error) {
+    console.log(error)
+    return error
+  }
+}

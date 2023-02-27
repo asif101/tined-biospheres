@@ -3,6 +3,7 @@ import express from 'express'
 import http from 'http'
 import { Server } from 'socket.io'
 import multer from 'multer'
+import bcrypt from 'bcrypt'
 import {
   deleteMetadata,
   getImages,
@@ -12,6 +13,7 @@ import {
   setModeration,
   getNextUnmoderatedImageMetadata,
   getLatestImages,
+  getCredentialsFromUsername,
 } from './modules/db.js'
 import { deleteFromS3, uploadToS3 } from './modules/s3.js'
 import { makeThumbnail } from './modules/image.js'
@@ -98,7 +100,9 @@ io.on('connection', (socket) => {
       .catch((e) => callback(e))
   })
   socket.on('authenticate', (data, callback) => {
-    callback(authenticate(data))
+    authenticate(data)
+      .then((venue) => callback(venue))
+      .catch(() => callback(false))
   })
   socket.on('fileUpload', (file, metadata, callback) => {
     uploadImage(file, metadata)
@@ -148,9 +152,20 @@ function sendLogToApp(message) {
 }
 
 function authenticate({ username, password }) {
-  if (debug) return true
-  if (username === process.env.APP_USERNAME && password === process.env.APP_PASSWORD) return true
-  else return false
+  return new Promise((resolve, reject) => {
+    if (debug) resolve('Global')
+    else {
+      getCredentialsFromUsername(username).then((credentials) => {
+        if (!credentials) reject()
+        else {
+          bcrypt.compare(password, credentials.hashed_password, (e, result) => {
+            if (result) resolve(credentials.venue)
+            else reject()
+          })
+        }
+      })
+    }
+  })
 }
 
 function uploadImage(imageBuffer, { sessionId, venue, plantName, userName }) {

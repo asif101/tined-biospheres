@@ -6,7 +6,7 @@ import { useSocket } from './utils/socketContext'
 
 export default function App() {
   const socket = useSocket()
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [loggedInVenue, setLoggedInVenue] = useState(false)
 
   useEffect(() => {
     socket.on('connect', () => console.log('connected'))
@@ -22,7 +22,7 @@ export default function App() {
       <div className='header'>
         <span>BIOSPHERES</span>
       </div>
-      {isLoggedIn ? <Main /> : <Login onLoginSuccess={() => setIsLoggedIn(true)} />}
+      {loggedInVenue ? <Main loggedInVenue={loggedInVenue} /> : <Login onLoginSuccess={(v) => setLoggedInVenue(v)} />}
     </div>
   )
 }

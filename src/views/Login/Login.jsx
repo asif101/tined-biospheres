@@ -11,9 +11,9 @@ export default function Login({ onLoginSuccess }) {
   const [error, setError] = useState(false)
 
   const login = () => {
-    socket.emit('authenticate', { username, password }, (auth) => {
-      if (!auth) setError(true)
-      else onLoginSuccess()
+    socket.emit('authenticate', { username, password }, (venue) => {
+      if (!venue) setError(true)
+      else onLoginSuccess(venue)
     })
   }
 

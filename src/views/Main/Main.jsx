@@ -7,7 +7,7 @@ import Moderate from './Moderate/Moderate'
 import './Main.css'
 import { useSocket } from '../../utils/socketContext'
 
-export default function Main() {
+export default function Main({ loggedInVenue }) {
   const socket = useSocket()
 
   const [mainView, setMainView] = useState(mainViews.MODERATE)
