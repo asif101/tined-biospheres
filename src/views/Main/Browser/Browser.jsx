@@ -17,7 +17,7 @@ import { getThumbnailUrl } from '../../../utils/general'
 import { useSocket } from '../../../utils/socketContext'
 import './Browser.css'
 
-export default function Browser({ onModerationChange }) {
+export default function Browser({ loggedInVenue, onModerationChange }) {
   const imagesPerPage = 25
 
   const socket = useSocket()
@@ -28,14 +28,14 @@ export default function Browser({ onModerationChange }) {
   const [dialogOpen, setDialogOpen] = useState(false)
 
   useEffect(() => {
-    socket.emit('getNumImages', (e, num) => {
+    socket.emit('getNumImages', loggedInVenue, (e, num) => {
       if (e) console.warn(e)
       else setNumImages(num)
     })
   }, [])
 
   useEffect(() => {
-    socket.emit('getImages', { page, imagesPerPage }, (e, data) => {
+    socket.emit('getImages', { loggedInVenue, page, imagesPerPage }, (e, data) => {
       if (e) console.warn(e)
       else {
         // console.log(data)
@@ -48,7 +48,9 @@ export default function Browser({ onModerationChange }) {
     <div className='browser'>
       <div className='filters'>
         <p>{`Total Images: ${numImages}`}</p>
-        <p>All Times are in GMT</p>
+        <p>{`All Times are in GMT${
+          loggedInVenue === 'Global' ? '' : `, Showing items created in ${loggedInVenue}`
+        }`}</p>
       </div>
       <div className='grid'>
         {images.map((x) => (

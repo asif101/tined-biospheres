@@ -8,7 +8,7 @@ const pool = new pg.Pool({
   user: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DATABASE,
-  max: 30
+  max: 30,
 })
 
 export async function insertMetadata(
@@ -48,10 +48,10 @@ export async function deleteMetadata(imageId) {
   }
 }
 
-export async function getNumImages() {
+export async function getNumImages(venue) {
   try {
     const client = await pool.connect()
-    const res = await client.query('select count (*) from metadata')
+    const res = await client.query(`select count (*) from metadata${venue ? ` where venue='${venue}'` : ''}`)
     await client.release()
     return res.rows[0].count
   } catch (error) {
@@ -60,11 +60,15 @@ export async function getNumImages() {
   }
 }
 
-export async function getImages({page, imagesPerPage}) {
+export async function getImages({ loggedInVenue, page, imagesPerPage }) {
   //TODO: needs filters
   try {
     const client = await pool.connect()
-    const res = await client.query(`select * from metadata order by created_timestamp desc offset ${(page - 1) * imagesPerPage} rows fetch next ${imagesPerPage} rows only`)
+    const res = await client.query(
+      `select * from metadata ${
+        loggedInVenue === 'Global' ? '' : `where venue='${loggedInVenue}' `
+      }order by created_timestamp desc offset ${(page - 1) * imagesPerPage} rows fetch next ${imagesPerPage} rows only`
+    )
     await client.release()
     return res.rows
   } catch (error) {
@@ -77,7 +81,9 @@ export async function getImages({page, imagesPerPage}) {
 export async function setModeration(imageId, moderationState) {
   try {
     const client = await pool.connect()
-    const res = await client.query(`update metadata set moderation_state=${moderationState} where image_id='${imageId}'`)
+    const res = await client.query(
+      `update metadata set moderation_state=${moderationState} where image_id='${imageId}'`
+    )
     await client.release()
     return res.rows
   } catch (error) {
@@ -106,13 +112,17 @@ export async function getNextUnmoderatedImageMetadata() {
   }
 }
 
-//get latest images, split between global and venue 
+//get latest images, split between global and venue
 export async function getLatestImages(numImages, venue, venueSplit) {
   try {
     const numVenueImages = Math.round(numImages * venueSplit)
-    const venueImages = await pool.query(`select * from metadata where venue='${venue}' and moderation_state=1 order by created_timestamp desc limit ${numVenueImages}`)
+    const venueImages = await pool.query(
+      `select * from metadata where venue='${venue}' and moderation_state=1 order by created_timestamp desc limit ${numVenueImages}`
+    )
     const numGlobalImages = numImages - venueImages.rows.length
-    const globalImages = await pool.query(`select * from metadata where venue!='${venue}' and moderation_state=1 order by created_timestamp desc limit ${numGlobalImages}`)
+    const globalImages = await pool.query(
+      `select * from metadata where venue!='${venue}' and moderation_state=1 order by created_timestamp desc limit ${numGlobalImages}`
+    )
     return [...venueImages.rows, ...globalImages.rows]
   } catch (error) {
     console.log(error)

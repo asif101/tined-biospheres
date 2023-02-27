@@ -31,3 +31,6 @@ dist-ssr
 
 # environment variables
 .env
+
+# credentials
+cred.txt

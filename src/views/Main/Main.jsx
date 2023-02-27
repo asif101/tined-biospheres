@@ -40,7 +40,7 @@ export default function Main({ loggedInVenue }) {
         {mainView === mainViews.MODERATE && (
           <Moderate onModerationChange={refreshUnmoderatedImageCount} unmoderatedImageCount={unmoderatedImageCount} />
         )}
-        {mainView === mainViews.IMAGE_BROWSER && <Browser onModerationChange={refreshUnmoderatedImageCount} />}
+        {mainView === mainViews.IMAGE_BROWSER && <Browser loggedInVenue={loggedInVenue} onModerationChange={refreshUnmoderatedImageCount} />}
         {mainView === mainViews.UPLOAD_TESTER && <Upload onUpload={refreshUnmoderatedImageCount} />}
       </div>
     </div>
