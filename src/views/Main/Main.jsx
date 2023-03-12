@@ -23,7 +23,6 @@ export default function Main({ loggedInVenue }) {
 
   const refreshUnmoderatedImageCount = () => {
     socket.emit('countUnmoderatedImages', loggedInVenue, (e, count) => {
-      // console.log(count)
       if (e) console.warn(e)
       else setUnmoderatedImageCount(count)
     })
