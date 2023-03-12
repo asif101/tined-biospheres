@@ -89,13 +89,13 @@ app.post('/image', upload.single('image'), (req, res) => {
 io.on('connection', (socket) => {
   console.log('app connected')
   socket.on('disconnect', () => console.log('app disconnected'))
-  socket.on('countUnmoderatedImages', (callback) => {
-    countUnmoderatedImages()
+  socket.on('countUnmoderatedImages', (loggedInVenue, callback) => {
+    countUnmoderatedImages(loggedInVenue)
       .then((count) => callback(false, count))
       .catch((e) => callback(true))
   })
-  socket.on('getNextMetadata', (callback) => {
-    getNextUnmoderatedImageMetadata()
+  socket.on('getNextMetadata', (loggedInVenue, callback) => {
+    getNextUnmoderatedImageMetadata(loggedInVenue)
       .then((metadata) => callback(false, metadata))
       .catch((e) => callback(e))
   })

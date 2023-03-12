@@ -22,7 +22,7 @@ export default function Main({ loggedInVenue }) {
   }, [])
 
   const refreshUnmoderatedImageCount = () => {
-    socket.emit('countUnmoderatedImages', (e, count) => {
+    socket.emit('countUnmoderatedImages', loggedInVenue, (e, count) => {
       // console.log(count)
       if (e) console.warn(e)
       else setUnmoderatedImageCount(count)
@@ -38,9 +38,15 @@ export default function Main({ loggedInVenue }) {
       />
       <div className='content'>
         {mainView === mainViews.MODERATE && (
-          <Moderate onModerationChange={refreshUnmoderatedImageCount} unmoderatedImageCount={unmoderatedImageCount} />
+          <Moderate
+            loggedInVenue={loggedInVenue}
+            onModerationChange={refreshUnmoderatedImageCount}
+            unmoderatedImageCount={unmoderatedImageCount}
+          />
         )}
-        {mainView === mainViews.IMAGE_BROWSER && <Browser loggedInVenue={loggedInVenue} onModerationChange={refreshUnmoderatedImageCount} />}
+        {mainView === mainViews.IMAGE_BROWSER && (
+          <Browser loggedInVenue={loggedInVenue} onModerationChange={refreshUnmoderatedImageCount} />
+        )}
         {mainView === mainViews.UPLOAD_TESTER && <Upload onUpload={refreshUnmoderatedImageCount} />}
       </div>
     </div>

@@ -92,9 +92,9 @@ export async function setModeration(imageId, moderationState) {
   }
 }
 
-export async function countUnmoderatedImages() {
+export async function countUnmoderatedImages(loggedInVenue) {
   try {
-    const res = await pool.query('select count (*) from metadata where moderation_state=0')
+    const res = await pool.query(`select count (*) from metadata where moderation_state=0 ${loggedInVenue === 'Global' ? '' : `and venue='${loggedInVenue}'`}`)
     return res.rows[0].count
   } catch (error) {
     console.log(error)
@@ -102,9 +102,9 @@ export async function countUnmoderatedImages() {
   }
 }
 
-export async function getNextUnmoderatedImageMetadata() {
+export async function getNextUnmoderatedImageMetadata(loggedInVenue) {
   try {
-    const res = await pool.query('select * from metadata where moderation_state=0 order by created_timestamp limit 1')
+    const res = await pool.query(`select * from metadata where moderation_state=0 ${loggedInVenue === 'Global' ? '' : `and venue='${loggedInVenue}'`}order by created_timestamp limit 1`)
     return res.rows[0]
   } catch (error) {
     console.log(error)

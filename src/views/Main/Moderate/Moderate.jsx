@@ -3,26 +3,22 @@ import { DateTime } from 'luxon'
 import { getThumbnailUrl, getImageUrl } from '../../../utils/general'
 import { useSocket } from '../../../utils/socketContext'
 import './Moderate.css'
-import { CircularProgress, Skeleton, ToggleButton, ToggleButtonGroup } from '@mui/material'
+import { CircularProgress, ToggleButton, ToggleButtonGroup } from '@mui/material'
 import { Check, DoNotDisturbAlt, Inbox } from '@mui/icons-material'
 import { AnimatePresence, motion } from 'framer-motion'
 
-export default function Moderate({ onModerationChange, unmoderatedImageCount }) {
+export default function Moderate({ loggedInVenue, onModerationChange, unmoderatedImageCount }) {
   const socket = useSocket()
 
   const [metadata, setMetadata] = useState()
   const [imageLoaded, setImageLoaded] = useState(false)
 
   useEffect(() => {
-    getNextMetadata(true)
-  }, [])
-
-  useEffect(() => {
     getNextMetadata()
   }, [unmoderatedImageCount])
 
   function getNextMetadata(resetImageLoaded) {
-    socket.emit('getNextMetadata', (e, metadata) => {
+    socket.emit('getNextMetadata', loggedInVenue, (e, metadata) => {
       if (e) console.warn(e)
       else {
         if (resetImageLoaded) setImageLoaded(false)
@@ -47,7 +43,7 @@ export default function Moderate({ onModerationChange, unmoderatedImageCount }) 
             }}
           >
             <div className='column'>
-              <CircularProgress color='warning' style={{ opacity: imageLoaded ? 0 : 1 }}/>
+              <CircularProgress color='warning' style={{ opacity: imageLoaded ? 0 : 1 }} />
               <img
                 style={{ opacity: imageLoaded ? 1 : 0 }}
                 // src={getThumbnailUrl(metadata.image_id)}
@@ -84,6 +80,7 @@ export default function Moderate({ onModerationChange, unmoderatedImageCount }) 
                     socket.emit('updateModeration', metadata.image_id, v, (e) => {
                       if (e) console.warn(e)
                       else {
+                        console.log(3)
                         onModerationChange()
                         getNextMetadata(true)
                       }
