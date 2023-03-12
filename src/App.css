@@ -7,17 +7,25 @@
   align-items: center;
 
   & > .header {
-    width: calc(100% - 20px);
-    margin: 0 0 0 20px;
+    width: calc(100% - 40px);
+    margin: 0 20px 0 20px;
     height: 78px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+
     & > span {
       font-family: 'RobotoLight';
       color: white;
       font-size: 2.5rem;
       letter-spacing: 5px;
       font-weight: 100;
+    }
+
+    & > span:last-child {
+      text-transform: uppercase;
+      font-size: 1rem;
+      letter-spacing: 3px;
     }
   }
 }

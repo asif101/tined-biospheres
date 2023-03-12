@@ -21,6 +21,7 @@ export default function App() {
     <div className='app'>
       <div className='header'>
         <span>BIOSPHERES</span>
+        <span>{loggedInVenue}</span>
       </div>
       {loggedInVenue ? <Main loggedInVenue={loggedInVenue} /> : <Login onLoginSuccess={(v) => setLoggedInVenue(v)} />}
     </div>

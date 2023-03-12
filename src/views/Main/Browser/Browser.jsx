@@ -48,9 +48,7 @@ export default function Browser({ loggedInVenue, onModerationChange }) {
     <div className='browser'>
       <div className='filters'>
         <p>{`Total Images: ${numImages}`}</p>
-        <p>{`All Times are in GMT${
-          loggedInVenue === 'Global' ? '' : `, Showing items created in ${loggedInVenue}`
-        }`}</p>
+        <p>All Times are in GMT</p>
       </div>
       <div className='grid'>
         {images.map((x) => (
@@ -62,7 +60,7 @@ export default function Browser({ loggedInVenue, onModerationChange }) {
                 if (e) console.warn(e)
                 else {
                   onModerationChange()
-                  socket.emit('getImages', { page, imagesPerPage }, (e, data) => {
+                  socket.emit('getImages', { loggedInVenue, page, imagesPerPage }, (e, data) => {
                     if (e) console.warn(e)
                     else {
                       setImages(data)
@@ -100,7 +98,7 @@ export default function Browser({ loggedInVenue, onModerationChange }) {
                   if (e) console.warn(e)
                   else {
                     setNumImages(num)
-                    socket.emit('getImages', { page, imagesPerPage }, (e, data) => {
+                    socket.emit('getImages', { loggedInVenue, page, imagesPerPage }, (e, data) => {
                       if (e) console.warn(e)
                       else {
                         setImages(data)
