@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { DateTime } from 'luxon'
-import { getThumbnailUrl, getImageUrl } from '../../../utils/general'
+import { getImageUrl } from '../../../utils/general'
 import { useSocket } from '../../../utils/socketContext'
 import './Moderate.css'
 import { CircularProgress, ToggleButton, ToggleButtonGroup } from '@mui/material'
@@ -46,7 +46,6 @@ export default function Moderate({ loggedInVenue, onModerationChange, unmoderate
               <CircularProgress color='warning' style={{ opacity: imageLoaded ? 0 : 1 }} />
               <img
                 style={{ opacity: imageLoaded ? 1 : 0 }}
-                // src={getThumbnailUrl(metadata.image_id)}
                 src={getImageUrl(metadata.image_id)}
                 onLoad={() => setImageLoaded(true)}
               />
