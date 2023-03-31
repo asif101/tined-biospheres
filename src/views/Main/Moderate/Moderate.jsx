@@ -7,7 +7,7 @@ import { CircularProgress, ToggleButton, ToggleButtonGroup } from '@mui/material
 import { Check, DoNotDisturbAlt, Inbox } from '@mui/icons-material'
 import { AnimatePresence, motion } from 'framer-motion'
 
-export default function Moderate({ loggedInVenue, onModerationChange, unmoderatedImageCount }) {
+export default function Moderate({ loggedInVenue, s3BucketNames, onModerationChange, unmoderatedImageCount }) {
   const socket = useSocket()
 
   const [metadata, setMetadata] = useState()
@@ -46,7 +46,7 @@ export default function Moderate({ loggedInVenue, onModerationChange, unmoderate
               <CircularProgress color='warning' style={{ opacity: imageLoaded ? 0 : 1 }} />
               <img
                 style={{ opacity: imageLoaded ? 1 : 0 }}
-                src={getImageUrl(metadata.image_id)}
+                src={getImageUrl(s3BucketNames.image, metadata.image_id)}
                 onLoad={() => setImageLoaded(true)}
               />
             </div>

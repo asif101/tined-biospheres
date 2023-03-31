@@ -7,7 +7,7 @@ import Moderate from './Moderate/Moderate'
 import './Main.css'
 import { useSocket } from '../../utils/socketContext'
 
-export default function Main({ loggedInVenue }) {
+export default function Main({ loggedInVenue, s3BucketNames }) {
   const socket = useSocket()
 
   const [mainView, setMainView] = useState(mainViews.MODERATE)
@@ -39,12 +39,17 @@ export default function Main({ loggedInVenue }) {
         {mainView === mainViews.MODERATE && (
           <Moderate
             loggedInVenue={loggedInVenue}
+            s3BucketNames={s3BucketNames}
             onModerationChange={refreshUnmoderatedImageCount}
             unmoderatedImageCount={unmoderatedImageCount}
           />
         )}
         {mainView === mainViews.IMAGE_BROWSER && (
-          <Browser loggedInVenue={loggedInVenue} onModerationChange={refreshUnmoderatedImageCount} />
+          <Browser
+            loggedInVenue={loggedInVenue}
+            s3BucketNames={s3BucketNames}
+            onModerationChange={refreshUnmoderatedImageCount}
+          />
         )}
         {mainView === mainViews.UPLOAD_TESTER && <Upload onUpload={refreshUnmoderatedImageCount} />}
       </div>

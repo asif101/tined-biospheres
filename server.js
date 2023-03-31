@@ -128,11 +128,16 @@ io.on('connection', (socket) => {
       .then((imageId) => callback(false, imageId))
       .catch((e) => callback(e))
   })
-
   socket.on('updateModeration', (imageId, moderationState, callback) => {
     setModeration(imageId, moderationState)
       .then(() => callback(false))
       .catch((e) => callback(true))
+  })
+  socket.on('getS3BucketNames', (callback) => {
+    callback({
+      image: process.env.S3_BUCKET_IMAGES,
+      thumbnail: process.env.S3_BUCKET_IMAGE_THUMBNAILS
+    })
   })
 })
 

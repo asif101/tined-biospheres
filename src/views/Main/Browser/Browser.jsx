@@ -13,11 +13,11 @@ import {
 } from '@mui/material'
 import { DateTime } from 'luxon'
 import { useEffect, useState } from 'react'
-import { getThumbnailUrl } from '../../../utils/general'
+import { getImageUrl } from '../../../utils/general'
 import { useSocket } from '../../../utils/socketContext'
 import './Browser.css'
 
-export default function Browser({ loggedInVenue, onModerationChange }) {
+export default function Browser({ loggedInVenue, s3BucketNames, onModerationChange }) {
   const imagesPerPage = 25
 
   const socket = useSocket()
@@ -55,6 +55,7 @@ export default function Browser({ loggedInVenue, onModerationChange }) {
           <ImageCard
             key={x.image_id}
             data={x}
+            s3BucketNames={s3BucketNames}
             onModerationChange={(imageId, moderationState) => {
               socket.emit('updateModeration', imageId, moderationState, (e) => {
                 if (e) console.warn(e)
@@ -94,7 +95,7 @@ export default function Browser({ loggedInVenue, onModerationChange }) {
             color='error'
             onClick={() => {
               socket.emit('deleteImage', dialogOpen, () => {
-                socket.emit('getNumImages', (e, num) => {
+                socket.emit('getNumImages', loggedInVenue, (e, num) => {
                   if (e) console.warn(e)
                   else {
                     setNumImages(num)
@@ -118,11 +119,11 @@ export default function Browser({ loggedInVenue, onModerationChange }) {
   )
 }
 
-function ImageCard({ data, onModerationChange, onDelete }) {
+function ImageCard({ data, s3BucketNames, onModerationChange, onDelete }) {
   return (
     <div className='image-card'>
       <div className='column'>
-        <img src={getThumbnailUrl(data.image_id)} />
+        <img src={getImageUrl(s3BucketNames.thumbnail, data.image_id)} />
       </div>
       <div className='column'>
         <span>{DateTime.fromISO(data.created_timestamp).toUTC().toLocaleString(DateTime.DATETIME_MED)}</span>
