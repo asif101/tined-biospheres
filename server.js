@@ -175,9 +175,9 @@ function uploadImage(imageBuffer, { sessionId, venue, plantName, userName }) {
         //then, upload image and thumbnail
         const imageId = uuidv4()
         const imageName = `${imageId}.png`
-        uploadToS3(imageBuffer, imageName, 'tined-biospheres-images')
+        uploadToS3(imageBuffer, imageName, process.env.S3_BUCKET_IMAGES)
           .then((url) => {
-            uploadToS3(thumbnail, imageName, 'tined-biospheres-image-thumbnails')
+            uploadToS3(thumbnail, imageName, process.env.S3_BUCKET_IMAGE_THUMBNAILS)
               .then((url) => {
                 //finally, add metadata to postgres db
                 insertMetadata(imageId, sessionId, venue, plantName, userName, new Date(), 0)
@@ -201,9 +201,9 @@ function uploadImage(imageBuffer, { sessionId, venue, plantName, userName }) {
 function deleteImage(imageId) {
   return new Promise((resolve, reject) => {
     const imageName = `${imageId}.png`
-    deleteFromS3(imageName, 'tined-biospheres-images')
+    deleteFromS3(imageName, process.env.S3_BUCKET_IMAGES)
       .then(() => {
-        deleteFromS3(imageName, 'tined-biospheres-image-thumbnails')
+        deleteFromS3(imageName, process.env.S3_BUCKET_IMAGE_THUMBNAILS)
           .then(() => {
             deleteMetadata(imageId)
               .then(() => resolve(imageId))
