@@ -115,14 +115,23 @@ export async function getNextUnmoderatedImageMetadata(loggedInVenue) {
 //get latest images, split between global and venue
 export async function getLatestImages(numImages, venue, venueSplit) {
   try {
-    const numVenueImages = Math.round(numImages * venueSplit)
+    let desiredNumVenueImages = Math.round(numImages * venueSplit)
+    let desiredNumGlobalImages =  numImages - desiredNumVenueImages
+    const numGlobalImagesQuery = await pool.query(`select count (*) from metadata where venue!='${venue}' and moderation_state=1`)
+    const numGlobalImages = numGlobalImagesQuery.rows[0].count
+    const isEnoughGlobalImages = numGlobalImages >= desiredNumGlobalImages
+    if(!isEnoughGlobalImages) {
+      desiredNumVenueImages = desiredNumVenueImages + (desiredNumGlobalImages - numGlobalImages)
+      desiredNumGlobalImages = numGlobalImages
+    }
     const venueImages = await pool.query(
-      `select * from metadata where venue='${venue}' and moderation_state=1 order by created_timestamp desc limit ${numVenueImages}`
+      `select * from metadata where venue='${venue}' and moderation_state=1 order by created_timestamp desc limit ${desiredNumVenueImages}`
     )
-    const numGlobalImages = numImages - venueImages.rows.length
+    desiredNumGlobalImages = numImages - venueImages.rows.length
     const globalImages = await pool.query(
-      `select * from metadata where venue!='${venue}' and moderation_state=1 order by created_timestamp desc limit ${numGlobalImages}`
+      `select * from metadata where venue!='${venue}' and moderation_state=1 order by created_timestamp desc limit ${desiredNumGlobalImages}`
     )
+    // console.log(venueImages.rows.length, globalImages.rows.length)
     return [...venueImages.rows, ...globalImages.rows]
   } catch (error) {
     console.log(error)
