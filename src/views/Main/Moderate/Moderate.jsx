@@ -70,6 +70,10 @@ export default function Moderate({ loggedInVenue, s3BucketNames, onModerationCha
                   <span className='label'>Creator Name</span>
                   <span className='value'>{metadata.user_name !== '' ? metadata.user_name : 'None Provided'}</span>
                 </div>
+                <div className='info-item'>
+                  <span className='label'>Drawing Prompt</span>
+                  <span className='value'>{metadata.drawing_prompt !== '' ? metadata.drawing_prompt : 'None Provided'}</span>
+                </div>
               </div>
               <div className='button-panel'>
                 <ToggleButtonGroup
