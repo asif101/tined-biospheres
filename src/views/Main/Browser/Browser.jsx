@@ -128,6 +128,9 @@ function ImageCard({ data, s3BucketNames, onModerationChange, onDelete }) {
       <div className='column'>
         <span>{DateTime.fromISO(data.created_timestamp).toUTC().toLocaleString(DateTime.DATETIME_MED)}</span>
         <span>{data.venue}</span>
+        <span>{data.plant_name}</span>
+        <span>{data.user_name}</span>
+        <span>{data.drawing_prompt ?? 'No Prompt'}</span>
         <div className='button-panel'>
           <ToggleButtonGroup
             size='small'
