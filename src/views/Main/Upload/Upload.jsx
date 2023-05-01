@@ -15,6 +15,7 @@ export default function Upload({ onUpload }) {
   const [file, setFile] = useState()
   const [userName, setUserName] = useState('')
   const [plantName, setPlantName] = useState('')
+  const [drawingPrompt, setDrawingPrompt] = useState('')
   const [venue, setVenue] = useState(venues.SYDNEY)
 
   const [uploadStatus, setUploadStatus] = useState('ready')
@@ -53,6 +54,7 @@ export default function Upload({ onUpload }) {
             </FormControl>
             <TextField label='Plant name (Optional)' value={plantName} onChange={(e) => setPlantName(e.target.value)} />
             <TextField label='Creator name (Optional)' value={userName} onChange={(e) => setUserName(e.target.value)} />
+            <TextField label='Drawing Prompt (Optional)' value={drawingPrompt} onChange={(e) => setDrawingPrompt(e.target.value)} />
             <LoadingButton
               variant='contained'
               color={uploadStatus === 'success' ? 'success' : uploadStatus === 'error' ? 'error' : 'warning'}
@@ -69,8 +71,9 @@ export default function Upload({ onUpload }) {
                   {
                     sessionId,
                     venue,
-                    userName: userName !== '' ? userName : undefined,
                     plantName: plantName !== '' ? plantName : undefined,
+                    userName: userName !== '' ? userName : undefined,
+                    drawingPrompt: drawingPrompt !== '' ? drawingPrompt : undefined,
                   },
                   (e) => {
                     if (e) {

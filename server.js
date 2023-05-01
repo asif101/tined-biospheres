@@ -66,6 +66,7 @@ app.post('/image', upload.single('image'), (req, res) => {
       venue: req.body.venue,
       plantName: req.body?.plantName !== '' ? req.body?.plantName : undefined,
       userName: req.body?.userName !== '' ? req.body?.userName : undefined,
+      drawingPrompt: req.body?.drawingPrompt !== '' ? req.body?.drawingPrompt : undefined,
     })
       .then((imageId) => {
         io.emit('newImage')
@@ -136,7 +137,7 @@ io.on('connection', (socket) => {
   socket.on('getS3BucketNames', (callback) => {
     callback({
       image: process.env.S3_BUCKET_IMAGES,
-      thumbnail: process.env.S3_BUCKET_IMAGE_THUMBNAILS
+      thumbnail: process.env.S3_BUCKET_IMAGE_THUMBNAILS,
     })
   })
 })
@@ -173,7 +174,7 @@ function authenticate({ username, password }) {
   })
 }
 
-function uploadImage(imageBuffer, { sessionId, venue, plantName, userName }) {
+function uploadImage(imageBuffer, { sessionId, venue, plantName, userName, drawingPrompt }) {
   return new Promise((resolve, reject) => {
     makeThumbnail(imageBuffer) //first, make thumbnail
       .then((thumbnail) => {
@@ -185,7 +186,7 @@ function uploadImage(imageBuffer, { sessionId, venue, plantName, userName }) {
             uploadToS3(thumbnail, imageName, process.env.S3_BUCKET_IMAGE_THUMBNAILS)
               .then((url) => {
                 //finally, add metadata to postgres db
-                insertMetadata(imageId, sessionId, venue, plantName, userName, new Date(), 0)
+                insertMetadata(imageId, sessionId, venue, plantName, userName, drawingPrompt, new Date(), 0)
                   .then(() => resolve(imageId))
                   .catch((e) => handleError('error adding metadata to database', e))
               })

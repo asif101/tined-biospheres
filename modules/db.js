@@ -17,6 +17,7 @@ export async function insertMetadata(
   venue,
   plantName,
   userName,
+  drawingPrompt,
   createdTimestamp,
   moderationState
 ) {
@@ -24,8 +25,8 @@ export async function insertMetadata(
     const client = await pool.connect()
     await client.query('BEGIN')
     const queryText =
-      'INSERT INTO metadata (image_id, session_id, venue, plant_name, user_name, created_timestamp, moderation_state) VALUES($1, $2, $3, $4, $5, $6, $7)'
-    const queryValues = [imageId, sessionId, venue, plantName, userName, createdTimestamp, moderationState]
+      'INSERT INTO metadata (image_id, session_id, venue, plant_name, user_name, drawing_prompt, created_timestamp, moderation_state) VALUES($1, $2, $3, $4, $5, $6, $7, $8)'
+    const queryValues = [imageId, sessionId, venue, plantName, userName, drawingPrompt, createdTimestamp, moderationState]
     await client.query(queryText, queryValues)
     await client.query('COMMIT')
     await client.release()
