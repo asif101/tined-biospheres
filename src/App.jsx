@@ -23,7 +23,7 @@ export default function App() {
   return (
     <div className='app'>
       <div className='header'>
-        <span>BIOSPHERES</span>
+        <span>DEEP FIELD</span>
         <span>{loggedInVenue}</span>
       </div>
       {loggedInVenue ? (
