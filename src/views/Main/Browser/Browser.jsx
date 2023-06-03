@@ -25,7 +25,7 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
   const [numImages, setNumImages] = useState(0)
   const [page, setPage] = useState(1)
   const [images, setImages] = useState([])
-  const [dialogOpen, setDialogOpen] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
   useEffect(() => {
     socket.emit('getNumImages', loggedInVenue, (e, num) => {
@@ -70,7 +70,7 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
                 }
               })
             }}
-            onDelete={() => setDialogOpen(x.image_id)}
+            onDelete={() => setDeleteDialogOpen(x.image_id)}
           />
         ))}
       </div>
@@ -80,7 +80,7 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
         page={page}
         onChange={(e, p) => setPage(p)}
       />
-      <Dialog open={!!dialogOpen} onClose={() => setDialogOpen(false)}>
+      <Dialog open={!!deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
         <DialogTitle>Delete Image?</DialogTitle>
         <DialogContent>
           <DialogContentText>
@@ -88,13 +88,13 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button sx={{ color: 'grey' }} onClick={() => setDialogOpen(false)}>
+          <Button sx={{ color: 'grey' }} onClick={() => setDeleteDialogOpen(false)}>
             Cancel
           </Button>
           <Button
             color='error'
             onClick={() => {
-              socket.emit('deleteImage', dialogOpen, () => {
+              socket.emit('deleteImage', deleteDialogOpen, () => {
                 socket.emit('getNumImages', loggedInVenue, (e, num) => {
                   if (e) console.warn(e)
                   else {
@@ -103,7 +103,7 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
                       if (e) console.warn(e)
                       else {
                         setImages(data)
-                        setDialogOpen(false)
+                        setDeleteDialogOpen(false)
                       }
                     })
                   }
