@@ -1,0 +1,56 @@
+.image-details {
+  & .title-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  & .dialog-content {
+    display: flex;
+
+    & > .column {
+      display: flex;
+      flex-direction: column;
+
+      &:first-child {
+        width: 70%;
+        /* width: 813px;
+        min-width: 813px;
+        height: 813px; */
+      }
+
+      &:last-child {
+        width: 30%;
+
+        & > .text-area {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-around;
+          height: 50%;
+
+          & > .info-item {
+            display: flex;
+            flex-direction: column;
+
+            & > .label {
+              font-size: 1.2rem;
+              font-family: 'RobotoBold';
+            }
+
+            & > .value {
+              font-family: 'RobotoLight';
+              margin-bottom: 12px;
+            }
+          }
+
+          & > .id {
+            color: grey;
+          }
+        }
+      }
+      & > img {
+        height: 100%;
+        object-fit: contain;
+      }
+    }
+  }
+}

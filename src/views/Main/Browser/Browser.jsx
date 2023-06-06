@@ -15,6 +15,7 @@ import { DateTime } from 'luxon'
 import { useEffect, useState } from 'react'
 import { getImageUrl } from '../../../utils/general'
 import { useSocket } from '../../../utils/socketContext'
+import ImageDetails from './ImageDetails/ImageDetails'
 import './Browser.css'
 
 export default function Browser({ loggedInVenue, s3BucketNames, onModerationChange }) {
@@ -26,6 +27,7 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
   const [page, setPage] = useState(1)
   const [images, setImages] = useState([])
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [imageDetails, setImageDetails] = useState({ open: false, data: null })
 
   useEffect(() => {
     socket.emit('getNumImages', loggedInVenue, (e, num) => {
@@ -56,6 +58,7 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
             key={x.image_id}
             data={x}
             s3BucketNames={s3BucketNames}
+            onImageClick={() => setImageDetails({ open: true, data: x })}
             onModerationChange={(imageId, moderationState) => {
               socket.emit('updateModeration', imageId, moderationState, (e) => {
                 if (e) console.warn(e)
@@ -115,15 +118,20 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
           </Button>
         </DialogActions>
       </Dialog>
+      <ImageDetails
+        {...imageDetails}
+        onClose={() => setImageDetails((x) => ({ ...x, open: false }))}
+        s3BucketNames={s3BucketNames}
+      />
     </div>
   )
 }
 
-function ImageCard({ data, s3BucketNames, onModerationChange, onDelete }) {
+function ImageCard({ data, s3BucketNames, onImageClick, onModerationChange, onDelete }) {
   return (
     <div className='image-card'>
       <div className='column'>
-        <img src={getImageUrl(s3BucketNames.thumbnail, data.image_id)} />
+        <img src={getImageUrl(s3BucketNames.thumbnail, data.image_id)} onClick={onImageClick} />
       </div>
       <div className='column'>
         <span>{DateTime.fromISO(data.created_timestamp).toUTC().toLocaleString(DateTime.DATETIME_MED)}</span>
