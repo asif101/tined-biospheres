@@ -1,4 +1,8 @@
 .image-details {
+  & .MuiPaper-root {
+    border-radius: 15px;
+  }
+
   & .title-area {
     display: flex;
     justify-content: space-between;
