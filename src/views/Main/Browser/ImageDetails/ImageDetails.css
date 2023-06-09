@@ -17,9 +17,6 @@
 
       &:first-child {
         width: 70%;
-        /* width: 813px;
-        min-width: 813px;
-        height: 813px; */
       }
 
       &:last-child {
@@ -54,6 +51,18 @@
       & > img {
         height: 100%;
         object-fit: contain;
+      }
+
+      & > .placeholder {
+        position: relative;
+        width: 800px;
+        height: 100%;
+        & > .MuiCircularProgress-root {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+        }
       }
     }
   }
