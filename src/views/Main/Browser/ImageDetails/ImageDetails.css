@@ -28,11 +28,11 @@
           display: flex;
           flex-direction: column;
           justify-content: space-around;
-          height: 50%;
 
           & > .info-item {
             display: flex;
             flex-direction: column;
+            margin-bottom: 10px;
 
             & > .label {
               font-size: 1.2rem;
@@ -51,6 +51,7 @@
         }
       }
       & > img {
+        width: 100%;
         height: 100%;
         object-fit: contain;
       }
