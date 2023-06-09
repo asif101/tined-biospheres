@@ -12,12 +12,12 @@ import {
   CircularProgress,
 } from '@mui/material'
 import { getImageUrl } from '../../../../utils/general'
-import { Close } from '@mui/icons-material'
+import { ArrowForwardIos, Close } from '@mui/icons-material'
 import { DateTime } from 'luxon'
 import './ImageDetails.css'
 import { useState } from 'react'
 
-export default function ImageDetails({ open, data, onClose, s3BucketNames }) {
+export default function ImageDetails({ open, data, onClose, s3BucketNames, rowIndex, numImages, onSlide }) {
   const [imageLoaded, setImageLoaded] = useState(false)
 
   const handleClose = () => {
@@ -81,6 +81,20 @@ export default function ImageDetails({ open, data, onClose, s3BucketNames }) {
               </div>
             </div>
           </DialogContent>
+          {rowIndex !== 0 && (
+            <div className='prev-button'>
+              <IconButton onClick={() => onSlide(rowIndex - 1)}>
+                <ArrowForwardIos />
+              </IconButton>
+            </div>
+          )}
+          {rowIndex + 1 !== numImages && (
+            <div className='next-button'>
+              <IconButton onClick={() => onSlide(rowIndex + 1)}>
+                <ArrowForwardIos />
+              </IconButton>
+            </div>
+          )}
         </>
       )}
     </Dialog>

@@ -53,12 +53,14 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
         <p>All Times are in GMT</p>
       </div>
       <div className='grid'>
-        {images.map((x) => (
+        {images.map((x, i) => (
           <ImageCard
             key={x.image_id}
             data={x}
             s3BucketNames={s3BucketNames}
-            onImageClick={() => setImageDetails({ open: true, data: x })}
+            onImageClick={() => {
+              setImageDetails({ open: true, data: x, rowIndex: (page - 1) * imagesPerPage + i })
+            }}
             onModerationChange={(imageId, moderationState) => {
               socket.emit('updateModeration', imageId, moderationState, (e) => {
                 if (e) console.warn(e)
@@ -122,6 +124,15 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
         {...imageDetails}
         onClose={() => setImageDetails((x) => ({ ...x, open: false }))}
         s3BucketNames={s3BucketNames}
+        numImages={numImages}
+        onSlide={(rowIndex) => {
+          socket.emit('getImages', { loggedInVenue, page: rowIndex + 1, imagesPerPage: 1 }, (e, data) => {
+            if (e) console.warn(e)
+            else {
+              setImageDetails({ open: true, data: data[0], rowIndex: rowIndex })
+            }
+          })
+        }}
       />
     </div>
   )

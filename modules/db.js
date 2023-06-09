@@ -54,7 +54,7 @@ export async function getNumImages(venue) {
     const client = await pool.connect()
     const res = await client.query(`select count (*) from metadata${venue ? ` where venue='${venue}'` : ''}`)
     await client.release()
-    return res.rows[0].count
+    return parseInt(res.rows[0].count)
   } catch (error) {
     await client.release(true)
     return error

@@ -1,6 +1,8 @@
 .image-details {
   & .MuiPaper-root {
     border-radius: 15px;
+    position: relative;
+    overflow: visible;
   }
 
   & .title-area {
@@ -65,5 +67,21 @@
         }
       }
     }
+  }
+  .prev-button {
+    background-color: grey;
+    border-radius: 50%;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateX(-50%) rotate(180deg);
+  }
+  .next-button {
+    background-color: grey;
+    border-radius: 50%;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateX(50%);
   }
 }
