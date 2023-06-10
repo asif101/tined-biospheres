@@ -21,8 +21,8 @@ export async function insertMetadata(
   createdTimestamp,
   moderationState
 ) {
+  const client = await pool.connect()
   try {
-    const client = await pool.connect()
     await client.query('BEGIN')
     const queryText =
       'INSERT INTO metadata (image_id, session_id, venue, plant_name, user_name, drawing_prompt, created_timestamp, moderation_state) VALUES($1, $2, $3, $4, $5, $6, $7, $8)'
@@ -34,37 +34,37 @@ export async function insertMetadata(
     await client.query('ROLLBACK')
     await client.release(true)
     console.log(error)
-    return error
+    throw(error) 
   }
 }
 
 export async function deleteMetadata(imageId) {
+  const client = await pool.connect()
   try {
-    const client = await pool.connect()
     await client.query(`delete from metadata where image_id='${imageId}'`)
     await client.release()
   } catch (error) {
     await client.release(true)
-    return error
+    throw(error)
   }
 }
 
 export async function getNumImages(venue) {
+  const client = await pool.connect()
   try {
-    const client = await pool.connect()
     const res = await client.query(`select count (*) from metadata${venue ? ` where venue='${venue}'` : ''}`)
     await client.release()
     return parseInt(res.rows[0].count)
   } catch (error) {
     await client.release(true)
-    return error
+    throw(error)
   }
 }
 
 export async function getImages({ loggedInVenue, page, imagesPerPage }) {
   //TODO: needs filters
+  const client = await pool.connect()
   try {
-    const client = await pool.connect()
     const res = await client.query(
       `select * from metadata ${
         loggedInVenue === 'Global' ? '' : `where venue='${loggedInVenue}' `
@@ -74,14 +74,14 @@ export async function getImages({ loggedInVenue, page, imagesPerPage }) {
     return res.rows
   } catch (error) {
     await client.release(true)
-    return error
+    throw(error)
   }
 }
 
 //moderationState should be either 0,1,2 (unmoderated, pass, fail)
 export async function setModeration(imageId, moderationState) {
+  const client = await pool.connect()
   try {
-    const client = await pool.connect()
     const res = await client.query(
       `update metadata set moderation_state=${moderationState} where image_id='${imageId}'`
     )
@@ -89,7 +89,7 @@ export async function setModeration(imageId, moderationState) {
     return res.rows
   } catch (error) {
     await client.release(true)
-    return error
+    throw(error)
   }
 }
 
@@ -99,7 +99,7 @@ export async function countUnmoderatedImages(loggedInVenue) {
     return res.rows[0].count
   } catch (error) {
     console.log(error)
-    return error
+    throw(error)
   }
 }
 
@@ -109,7 +109,7 @@ export async function getNextUnmoderatedImageMetadata(loggedInVenue) {
     return res.rows[0]
   } catch (error) {
     console.log(error)
-    return error
+    throw(error)
   }
 }
 
@@ -136,7 +136,7 @@ export async function getLatestImages(numImages, venue, venueSplit) {
     return [...venueImages.rows, ...globalImages.rows]
   } catch (error) {
     console.log(error)
-    return error
+    throw(error)
   }
 }
 
@@ -146,6 +146,6 @@ export async function getCredentialsFromUsername(username) {
     return res.rows[0]
   } catch (error) {
     console.log(error)
-    return error
+    throw(error)
   }
 }
