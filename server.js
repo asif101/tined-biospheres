@@ -39,7 +39,11 @@ app.post('/latestImages', upload.none(), (req, res) => {
     console.log('rejected latestImages POST request with reason:', e)
     res.status(400).send(e)
   } else {
-    getLatestImages(49, req.body.venue, 0.3)
+    const parsedNumImages = parseInt(req.body.numImages)
+    const validNumImages = Number.isInteger(parsedNumImages)
+    if (req.body.numImages && !validNumImages) console.warn('numImages is invalid. using default')
+    const numImages = validNumImages ? parsedNumImages : 49
+    getLatestImages(numImages, req.body.venue, 0.3)
       .then((ids) => res.status(200).send(ids))
       .catch((e) => res.status(500).send(e))
   }
