@@ -208,6 +208,7 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
                 socket.emit('getNumImages', { loggedInVenue, filters }, (e, num) => {
                   if (e) console.warn(e)
                   else {
+                    onModerationChange()
                     setNumImages(num)
                     refreshImages(() => setDeleteDialogOpen(false))
                     refreshNumImages()
