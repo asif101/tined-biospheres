@@ -53,8 +53,8 @@ export async function deleteMetadata(imageId) {
 export async function getNumImages({loggedInVenue, filters}) {
   const client = await pool.connect()
   try {
-    const venueFilterClause = loggedInVenue !== 'Global' ? ` where venue='${loggedInVenue}'` : filters.venue !== 'Global' ? ` where venue='${filters.venue}'` : ''
-    const res = await client.query(`select count (*) from metadata${venueFilterClause}`)
+    const filterClause = buildFilterClause(loggedInVenue, filters)
+    const res = await client.query(`select count (*) from metadata ${filterClause}`)
     await client.release()
     return parseInt(res.rows[0].count)
   } catch (error) {
@@ -66,9 +66,9 @@ export async function getNumImages({loggedInVenue, filters}) {
 export async function getImages({ loggedInVenue, page, imagesPerPage, filters }) {
   const client = await pool.connect()
   try {
-    const venueFilterClause = loggedInVenue !== 'Global' ? `where venue='${loggedInVenue}' ` : filters.venue !== 'Global' ? `where venue='${filters.venue}' ` : ''
+    const filterClause = buildFilterClause(loggedInVenue, filters)
     const res = await client.query(
-      `select * from metadata ${venueFilterClause}order by created_timestamp desc offset ${(page - 1) * imagesPerPage} rows fetch next ${imagesPerPage} rows only`
+      `select * from metadata ${filterClause} order by created_timestamp desc offset ${(page - 1) * imagesPerPage} rows fetch next ${imagesPerPage} rows only`
     )
     await client.release()
     return res.rows
@@ -163,4 +163,25 @@ export async function setFeaturedState(imageId, featured) {
     await client.release(true)
     throw(error)
   }
+}
+
+function buildFilterClause(loggedInVenue, filters) {
+  const venueFilterClause =
+    loggedInVenue !== "Global"
+      ? ` venue='${loggedInVenue}' `
+      : filters.venue !== "Global"
+      ? ` venue='${filters.venue}' `
+      : "";
+  const statusFilterClause = statusClauseLookup[filters.status]
+
+
+  return `${!!(venueFilterClause || statusFilterClause) ? 'where ' : ''} ${venueFilterClause} ${!!(venueFilterClause && statusFilterClause) ? 'and ': ''}${statusFilterClause}`
+}
+
+const statusClauseLookup = {
+  All: '',
+  Featured: 'featured=true',
+  Approved: 'moderation_state=1',
+  Denied: 'moderation_state=2',
+  Unmoderated:'moderation_state=0'
 }

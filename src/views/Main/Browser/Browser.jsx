@@ -32,7 +32,7 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
   const [numImages, setNumImages] = useState(0)
   const [page, setPage] = useState(1)
   const [images, setImages] = useState([])
-  const [filters, setFilters] = useState({ venue: 'Global', state: 'All' })
+  const [filters, setFilters] = useState({ venue: 'Global', status: 'All' })
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [imageDetails, setImageDetails] = useState({ open: false, data: null })
 
@@ -74,8 +74,8 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
       <div className='header-area'>
         <p>{`Total Images: ${numImages}`}</p>
         <div className='right'>
-          {loggedInVenue == 'Global' && (
-            <div className='filters'>
+          <div className='filters'>
+            {loggedInVenue == 'Global' && (
               <FormControl sx={{ width: 140 }}>
                 <InputLabel color='warning'>Venue</InputLabel>
                 <Select
@@ -100,8 +100,31 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
                   ))}
                 </Select>
               </FormControl>
-            </div>
-          )}
+            )}
+            <FormControl sx={{ width: 150 }}>
+              <InputLabel color='warning'>Status</InputLabel>
+              <Select
+                color='warning'
+                value={filters.status}
+                label='Status'
+                size='small'
+                onChange={(e) => {
+                  setFilters((s) => {
+                    const newFilters = { ...s, status: e.target.value }
+                    refreshImages(null, newFilters)
+                    refreshNumImages(newFilters)
+                    return newFilters
+                  })
+                }}
+              >
+                <MenuItem value='All'>All</MenuItem>
+                {loggedInVenue == 'Global' && <MenuItem value='Featured'>Featured</MenuItem>}
+                <MenuItem value='Approved'>Approved</MenuItem>
+                <MenuItem value='Denied'>Denied</MenuItem>
+                <MenuItem value='Unmoderated'>Unmoderated</MenuItem>
+              </Select>
+            </FormControl>
+          </div>
           <p>All Times are in GMT</p>
         </div>
       </div>
@@ -120,6 +143,7 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
                 if (e) console.warn(e)
                 else {
                   refreshImages()
+                  refreshNumImages()
                 }
               })
             }}
@@ -129,6 +153,7 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
                 else {
                   onModerationChange()
                   refreshImages()
+                  refreshNumImages()
                 }
               })
             }}
@@ -162,6 +187,7 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
                   else {
                     setNumImages(num)
                     refreshImages(() => setDeleteDialogOpen(false))
+                    refreshNumImages()
                   }
                 })
               })

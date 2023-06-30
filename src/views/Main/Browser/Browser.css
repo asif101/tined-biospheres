@@ -21,6 +21,10 @@
 
       & > .filters {
         margin-right: 25px;
+
+        & :first-child {
+          margin-right: 5px;
+        }
       }
     }
   }
