@@ -137,12 +137,12 @@ io.on('connection', (socket) => {
   socket.on('updateModeration', (imageId, moderationState, callback) => {
     setModeration(imageId, moderationState)
       .then(() => callback(false))
-      .catch((e) => callback(true))
+      .catch((e) => callback(e))
   })
   socket.on('updateFeatured', (imageId, featured, callback) => {
     setFeaturedState(imageId, featured)
       .then(() => callback(false))
-      .catch((e) => callback(true))
+      .catch((e) => callback(e))
   })
   socket.on('getS3BucketNames', (callback) => {
     callback({
