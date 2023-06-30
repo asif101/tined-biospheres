@@ -19,14 +19,15 @@ export async function insertMetadata(
   userName,
   drawingPrompt,
   createdTimestamp,
-  moderationState
+  moderationState,
+  featured
 ) {
   const client = await pool.connect()
   try {
     await client.query('BEGIN')
     const queryText =
-      'INSERT INTO metadata (image_id, session_id, venue, plant_name, user_name, drawing_prompt, created_timestamp, moderation_state) VALUES($1, $2, $3, $4, $5, $6, $7, $8)'
-    const queryValues = [imageId, sessionId, venue, plantName, userName, drawingPrompt, createdTimestamp, moderationState]
+      'INSERT INTO metadata (image_id, session_id, venue, plant_name, user_name, drawing_prompt, created_timestamp, moderation_state, featured) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)'
+    const queryValues = [imageId, sessionId, venue, plantName, userName, drawingPrompt, createdTimestamp, moderationState, featured]
     await client.query(queryText, queryValues)
     await client.query('COMMIT')
     await client.release()

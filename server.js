@@ -190,7 +190,7 @@ function uploadImage(imageBuffer, { sessionId, venue, plantName, userName, drawi
             uploadToS3(thumbnail, imageName, process.env.S3_BUCKET_IMAGE_THUMBNAILS)
               .then((url) => {
                 //finally, add metadata to postgres db
-                insertMetadata(imageId, sessionId, venue, plantName, userName, drawingPrompt, new Date(), 0)
+                insertMetadata(imageId, sessionId, venue, plantName, userName, drawingPrompt, new Date(), 0, false)
                   .then(() => resolve(imageId))
                   .catch((e) => handleError('error adding metadata to database', e))
               })
