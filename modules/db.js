@@ -27,7 +27,17 @@ export async function insertMetadata(
     await client.query('BEGIN')
     const queryText =
       'INSERT INTO metadata (image_id, session_id, venue, plant_name, user_name, drawing_prompt, created_timestamp, moderation_state, featured) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)'
-    const queryValues = [imageId, sessionId, venue, plantName, userName, drawingPrompt, createdTimestamp, moderationState, featured]
+    const queryValues = [
+      imageId,
+      sessionId,
+      venue,
+      plantName,
+      userName,
+      drawingPrompt,
+      createdTimestamp,
+      moderationState,
+      featured,
+    ]
     await client.query(queryText, queryValues)
     await client.query('COMMIT')
     await client.release()
@@ -35,7 +45,7 @@ export async function insertMetadata(
     await client.query('ROLLBACK')
     await client.release(true)
     console.log(error)
-    throw(error) 
+    throw error
   }
 }
 
@@ -46,11 +56,11 @@ export async function deleteMetadata(imageId) {
     await client.release()
   } catch (error) {
     await client.release(true)
-    throw(error)
+    throw error
   }
 }
 
-export async function getNumImages({loggedInVenue, filters}) {
+export async function getNumImages({ loggedInVenue, filters }) {
   const client = await pool.connect()
   try {
     const filterClause = buildFilterClause(loggedInVenue, filters)
@@ -59,7 +69,7 @@ export async function getNumImages({loggedInVenue, filters}) {
     return parseInt(res.rows[0].count)
   } catch (error) {
     await client.release(true)
-    throw(error)
+    throw error
   }
 }
 
@@ -68,13 +78,15 @@ export async function getImages({ loggedInVenue, page, imagesPerPage, filters })
   try {
     const filterClause = buildFilterClause(loggedInVenue, filters)
     const res = await client.query(
-      `select * from metadata ${filterClause} order by created_timestamp desc offset ${(page - 1) * imagesPerPage} rows fetch next ${imagesPerPage} rows only`
+      `select * from metadata ${filterClause} order by created_timestamp desc offset ${
+        (page - 1) * imagesPerPage
+      } rows fetch next ${imagesPerPage} rows only`
     )
     await client.release()
     return res.rows
   } catch (error) {
     await client.release(true)
-    throw(error)
+    throw error
   }
 }
 
@@ -89,27 +101,35 @@ export async function setModeration(imageId, moderationState) {
     return res.rows
   } catch (error) {
     await client.release(true)
-    throw(error)
+    throw error
   }
 }
 
 export async function countUnmoderatedImages(loggedInVenue) {
   try {
-    const res = await pool.query(`select count (*) from metadata where moderation_state=0 ${loggedInVenue === 'Global' ? '' : `and venue='${loggedInVenue}'`}`)
+    const res = await pool.query(
+      `select count (*) from metadata where moderation_state=0 ${
+        loggedInVenue === 'Global' ? '' : `and venue='${loggedInVenue}'`
+      }`
+    )
     return res.rows[0].count
   } catch (error) {
     console.log(error)
-    throw(error)
+    throw error
   }
 }
 
 export async function getNextUnmoderatedImageMetadata(loggedInVenue) {
   try {
-    const res = await pool.query(`select * from metadata where moderation_state=0 ${loggedInVenue === 'Global' ? '' : `and venue='${loggedInVenue}'`}order by created_timestamp limit 1`)
+    const res = await pool.query(
+      `select * from metadata where moderation_state=0 ${
+        loggedInVenue === 'Global' ? '' : `and venue='${loggedInVenue}'`
+      }order by created_timestamp limit 1`
+    )
     return res.rows[0]
   } catch (error) {
     console.log(error)
-    throw(error)
+    throw error
   }
 }
 
@@ -117,11 +137,13 @@ export async function getNextUnmoderatedImageMetadata(loggedInVenue) {
 export async function getLatestImages(numImages, venue, venueSplit) {
   try {
     let desiredNumVenueImages = Math.round(numImages * venueSplit)
-    let desiredNumGlobalImages =  numImages - desiredNumVenueImages
-    const numGlobalImagesQuery = await pool.query(`select count (*) from metadata where venue!='${venue}' and moderation_state=1`)
+    let desiredNumGlobalImages = numImages - desiredNumVenueImages
+    const numGlobalImagesQuery = await pool.query(
+      `select count (*) from metadata where venue!='${venue}' and moderation_state=1`
+    )
     const numGlobalImages = numGlobalImagesQuery.rows[0].count
     const isEnoughGlobalImages = numGlobalImages >= desiredNumGlobalImages
-    if(!isEnoughGlobalImages) {
+    if (!isEnoughGlobalImages) {
       desiredNumVenueImages = desiredNumVenueImages + (desiredNumGlobalImages - numGlobalImages)
       desiredNumGlobalImages = numGlobalImages
     }
@@ -136,7 +158,7 @@ export async function getLatestImages(numImages, venue, venueSplit) {
     return [...venueImages.rows, ...globalImages.rows]
   } catch (error) {
     console.log(error)
-    throw(error)
+    throw error
   }
 }
 
@@ -146,7 +168,7 @@ export async function getCredentialsFromUsername(username) {
     return res.rows[0]
   } catch (error) {
     console.log(error)
-    throw(error)
+    throw error
   }
 }
 
@@ -154,28 +176,27 @@ export async function getCredentialsFromUsername(username) {
 export async function setFeaturedState(imageId, featured) {
   const client = await pool.connect()
   try {
-    const res = await client.query(
-      `update metadata set featured=${featured} where image_id='${imageId}'`
-    )
+    const res = await client.query(`update metadata set featured=${featured} where image_id='${imageId}'`)
     await client.release()
     return res.rows
   } catch (error) {
     await client.release(true)
-    throw(error)
+    throw error
   }
 }
 
 function buildFilterClause(loggedInVenue, filters) {
   const venueFilterClause =
-    loggedInVenue !== "Global"
+    loggedInVenue !== 'Global'
       ? ` venue='${loggedInVenue}' `
-      : filters.venue !== "Global"
+      : filters.venue !== 'Global'
       ? ` venue='${filters.venue}' `
-      : "";
+      : ''
   const statusFilterClause = statusClauseLookup[filters.status]
 
-
-  return `${!!(venueFilterClause || statusFilterClause) ? 'where ' : ''} ${venueFilterClause} ${!!(venueFilterClause && statusFilterClause) ? 'and ': ''}${statusFilterClause}`
+  return `${!!(venueFilterClause || statusFilterClause) ? 'where ' : ''} ${venueFilterClause} ${
+    !!(venueFilterClause && statusFilterClause) ? 'and ' : ''
+  }${statusFilterClause}`
 }
 
 const statusClauseLookup = {
@@ -183,5 +204,5 @@ const statusClauseLookup = {
   Featured: 'featured=true',
   Approved: 'moderation_state=1',
   Denied: 'moderation_state=2',
-  Unmoderated:'moderation_state=0'
+  Unmoderated: 'moderation_state=0',
 }
