@@ -6,8 +6,12 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  FormControl,
   IconButton,
+  InputLabel,
+  MenuItem,
   Pagination,
+  Select,
   Stack,
   ToggleButton,
   ToggleButtonGroup,
@@ -15,6 +19,7 @@ import {
 import { DateTime } from 'luxon'
 import { useEffect, useState } from 'react'
 import { getImageUrl } from '../../../utils/general'
+import { venues } from '../../../utils/enum'
 import { useSocket } from '../../../utils/socketContext'
 import ImageDetails from './ImageDetails/ImageDetails'
 import './Browser.css'
@@ -27,31 +32,78 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
   const [numImages, setNumImages] = useState(0)
   const [page, setPage] = useState(1)
   const [images, setImages] = useState([])
+  const [filters, setFilters] = useState({ venue: 'Global', state: 'All' })
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [imageDetails, setImageDetails] = useState({ open: false, data: null })
 
   useEffect(() => {
-    socket.emit('getNumImages', loggedInVenue, (e, num) => {
+    socket.emit('getNumImages', { loggedInVenue, filters }, (e, num) => {
       if (e) console.warn(e)
       else setNumImages(num)
     })
   }, [])
 
   useEffect(() => {
-    socket.emit('getImages', { loggedInVenue, page, imagesPerPage }, (e, data) => {
+    socket.emit('getImages', { loggedInVenue, page, imagesPerPage, filters }, (e, data) => {
       if (e) console.warn(e)
       else {
-        // console.log(data)
         setImages(data)
       }
     })
   }, [page])
 
+  const refreshImages = (callback, filterOverride) => {
+    socket.emit('getImages', { loggedInVenue, page, imagesPerPage, filters: filterOverride ?? filters }, (e, data) => {
+      if (e) console.warn(e)
+      else {
+        setImages(data)
+        if (callback) callback()
+      }
+    })
+  }
+
+  const refreshNumImages = (filterOverride) => {
+    socket.emit('getNumImages', { loggedInVenue, filters: filterOverride }, (e, num) => {
+      if (e) console.warn(e)
+      else setNumImages(num)
+    })
+  }
+
   return (
     <div className='browser'>
-      <div className='filters'>
+      <div className='header-area'>
         <p>{`Total Images: ${numImages}`}</p>
-        <p>All Times are in GMT</p>
+        <div className='right'>
+          {loggedInVenue == 'Global' && (
+            <div className='filters'>
+              <FormControl sx={{ width: 140 }}>
+                <InputLabel color='warning'>Venue</InputLabel>
+                <Select
+                  color='warning'
+                  value={filters.venue}
+                  label='Venue'
+                  size='small'
+                  onChange={(e) => {
+                    setFilters((s) => {
+                      const newFilters = { ...s, venue: e.target.value }
+                      refreshImages(null, newFilters)
+                      refreshNumImages(newFilters)
+                      return newFilters
+                    })
+                  }}
+                >
+                  <MenuItem value='Global'>All</MenuItem>
+                  {Object.values(venues).map((x) => (
+                    <MenuItem key={x} value={x}>
+                      {x}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
+          )}
+          <p>All Times are in GMT</p>
+        </div>
       </div>
       <div className='grid'>
         {images.map((x, i) => (
@@ -67,13 +119,7 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
               socket.emit('updateModeration', imageId, moderationState, (e) => {
                 if (e) console.warn(e)
                 else {
-                  // onModerationChange()
-                  socket.emit('getImages', { loggedInVenue, page, imagesPerPage }, (e, data) => {
-                    if (e) console.warn(e)
-                    else {
-                      setImages(data)
-                    }
-                  })
+                  refreshImages()
                 }
               })
             }}
@@ -82,12 +128,7 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
                 if (e) console.warn(e)
                 else {
                   onModerationChange()
-                  socket.emit('getImages', { loggedInVenue, page, imagesPerPage }, (e, data) => {
-                    if (e) console.warn(e)
-                    else {
-                      setImages(data)
-                    }
-                  })
+                  refreshImages()
                 }
               })
             }}
@@ -120,13 +161,7 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
                   if (e) console.warn(e)
                   else {
                     setNumImages(num)
-                    socket.emit('getImages', { loggedInVenue, page, imagesPerPage }, (e, data) => {
-                      if (e) console.warn(e)
-                      else {
-                        setImages(data)
-                        setDeleteDialogOpen(false)
-                      }
-                    })
+                    refreshImages(() => setDeleteDialogOpen(false))
                   }
                 })
               })
@@ -142,7 +177,7 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
         s3BucketNames={s3BucketNames}
         numImages={numImages}
         onSlide={(rowIndex) => {
-          socket.emit('getImages', { loggedInVenue, page: rowIndex + 1, imagesPerPage: 1 }, (e, data) => {
+          socket.emit('getImages', { loggedInVenue, page: rowIndex + 1, imagesPerPage: 1, filters }, (e, data) => {
             if (e) console.warn(e)
             else {
               setImageDetails({ open: true, data: data[0], rowIndex: rowIndex })

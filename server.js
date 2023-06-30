@@ -115,8 +115,8 @@ io.on('connection', (socket) => {
       .then((imageId) => callback(false, `successfully added image with id ${imageId}`))
       .catch((e) => callback(e))
   })
-  socket.on('getNumImages', (venue, callback) => {
-    getNumImages(venue === 'Global' ? undefined : venue)
+  socket.on('getNumImages', (queryParams, callback) => {
+    getNumImages(queryParams)
       .then((num) => {
         callback(false, num)
       })

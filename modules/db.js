@@ -50,10 +50,11 @@ export async function deleteMetadata(imageId) {
   }
 }
 
-export async function getNumImages(venue) {
+export async function getNumImages({loggedInVenue, filters}) {
   const client = await pool.connect()
   try {
-    const res = await client.query(`select count (*) from metadata${venue ? ` where venue='${venue}'` : ''}`)
+    const venueFilterClause = loggedInVenue !== 'Global' ? ` where venue='${loggedInVenue}'` : filters.venue !== 'Global' ? ` where venue='${filters.venue}'` : ''
+    const res = await client.query(`select count (*) from metadata${venueFilterClause}`)
     await client.release()
     return parseInt(res.rows[0].count)
   } catch (error) {
@@ -62,14 +63,12 @@ export async function getNumImages(venue) {
   }
 }
 
-export async function getImages({ loggedInVenue, page, imagesPerPage }) {
-  //TODO: needs filters
+export async function getImages({ loggedInVenue, page, imagesPerPage, filters }) {
   const client = await pool.connect()
   try {
+    const venueFilterClause = loggedInVenue !== 'Global' ? `where venue='${loggedInVenue}' ` : filters.venue !== 'Global' ? `where venue='${filters.venue}' ` : ''
     const res = await client.query(
-      `select * from metadata ${
-        loggedInVenue === 'Global' ? '' : `where venue='${loggedInVenue}' `
-      }order by created_timestamp desc offset ${(page - 1) * imagesPerPage} rows fetch next ${imagesPerPage} rows only`
+      `select * from metadata ${venueFilterClause}order by created_timestamp desc offset ${(page - 1) * imagesPerPage} rows fetch next ${imagesPerPage} rows only`
     )
     await client.release()
     return res.rows
