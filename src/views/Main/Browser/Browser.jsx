@@ -1,4 +1,4 @@
-import { Check, Delete, DoNotDisturbAlt } from '@mui/icons-material'
+import { Check, Delete, DoNotDisturbAlt, Star, StarBorder } from '@mui/icons-material'
 import {
   Button,
   Dialog,
@@ -8,6 +8,7 @@ import {
   DialogTitle,
   IconButton,
   Pagination,
+  Stack,
   ToggleButton,
   ToggleButtonGroup,
 } from '@mui/material'
@@ -63,6 +64,20 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
             }}
             onModerationChange={(imageId, moderationState) => {
               socket.emit('updateModeration', imageId, moderationState, (e) => {
+                if (e) console.warn(e)
+                else {
+                  // onModerationChange()
+                  socket.emit('getImages', { loggedInVenue, page, imagesPerPage }, (e, data) => {
+                    if (e) console.warn(e)
+                    else {
+                      setImages(data)
+                    }
+                  })
+                }
+              })
+            }}
+            onFeatureChange={(imageId, featured) => {
+              socket.emit('updateFeatured', imageId, featured, (e) => {
                 if (e) console.warn(e)
                 else {
                   onModerationChange()
@@ -138,7 +153,7 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
   )
 }
 
-function ImageCard({ data, s3BucketNames, onImageClick, onModerationChange, onDelete }) {
+function ImageCard({ data, s3BucketNames, onImageClick, onModerationChange, onFeatureChange, onDelete }) {
   return (
     <div className='image-card'>
       <div className='column'>
@@ -160,15 +175,20 @@ function ImageCard({ data, s3BucketNames, onImageClick, onModerationChange, onDe
             }}
           >
             <ToggleButton value={1}>
-              <Check />
+              <Check fontSize='small' />
             </ToggleButton>
             <ToggleButton value={2}>
-              <DoNotDisturbAlt />
+              <DoNotDisturbAlt fontSize='small' />
             </ToggleButton>
           </ToggleButtonGroup>
-          <IconButton className='delete ' onClick={() => onDelete(data.image_id)}>
-            <Delete />
-          </IconButton>
+          <Stack className='status-buttons' direction='row' alignItems='center' spacing={0}>
+            <IconButton size='small' className='featured ' onClick={() => onFeatureChange(data.image_id, !data.featured)}>
+              {data.featured ? <Star color='warning' fontSize='small' /> : <StarBorder fontSize='small' /> }
+            </IconButton>
+            <IconButton size='small' className='delete ' onClick={() => onDelete(data.image_id)}>
+              <Delete fontSize='small'/>
+            </IconButton>
+          </Stack>
         </div>
       </div>
     </div>

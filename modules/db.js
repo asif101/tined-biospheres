@@ -150,3 +150,18 @@ export async function getCredentialsFromUsername(username) {
     throw(error)
   }
 }
+
+//sets an image's featured state (boolean)
+export async function setFeaturedState(imageId, featured) {
+  const client = await pool.connect()
+  try {
+    const res = await client.query(
+      `update metadata set featured=${featured} where image_id='${imageId}'`
+    )
+    await client.release()
+    return res.rows
+  } catch (error) {
+    await client.release(true)
+    throw(error)
+  }
+}

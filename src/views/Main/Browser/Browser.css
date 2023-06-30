@@ -87,7 +87,7 @@
             }
           }
 
-          & > .delete {
+          & > .status-buttons {
             margin-left: 4px;
           }
         }
