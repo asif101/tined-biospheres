@@ -58,6 +58,7 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
           <ImageCard
             key={x.image_id}
             data={x}
+            loggedInVenue={loggedInVenue}
             s3BucketNames={s3BucketNames}
             onImageClick={() => {
               setImageDetails({ open: true, data: x, rowIndex: (page - 1) * imagesPerPage + i })
@@ -153,7 +154,15 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
   )
 }
 
-function ImageCard({ data, s3BucketNames, onImageClick, onModerationChange, onFeatureChange, onDelete }) {
+function ImageCard({
+  data,
+  loggedInVenue,
+  s3BucketNames,
+  onImageClick,
+  onModerationChange,
+  onFeatureChange,
+  onDelete,
+}) {
   return (
     <div className='image-card'>
       <div className='column'>
@@ -181,14 +190,21 @@ function ImageCard({ data, s3BucketNames, onImageClick, onModerationChange, onFe
               <DoNotDisturbAlt fontSize='small' />
             </ToggleButton>
           </ToggleButtonGroup>
-          <Stack className='status-buttons' direction='row' alignItems='center' spacing={0}>
-            <IconButton size='small' className='featured ' onClick={() => onFeatureChange(data.image_id, !data.featured)}>
-              {data.featured ? <Star color='warning' fontSize='small' /> : <StarBorder fontSize='small' /> }
-            </IconButton>
-            <IconButton size='small' className='delete ' onClick={() => onDelete(data.image_id)}>
-              <Delete fontSize='small'/>
-            </IconButton>
-          </Stack>
+          {loggedInVenue === 'Global' && (
+            <Stack className='status-buttons' direction='row' alignItems='center' spacing={0}>
+              <IconButton
+                size='small'
+                className='featured '
+                onClick={() => onFeatureChange(data.image_id, !data.featured)}
+              >
+                {data.featured ? <Star color='warning' fontSize='small' /> : <StarBorder fontSize='small' />}
+              </IconButton>
+
+              <IconButton size='small' className='delete ' onClick={() => onDelete(data.image_id)}>
+                <Delete fontSize='small' />
+              </IconButton>
+            </Stack>
+          )}
         </div>
       </div>
     </div>

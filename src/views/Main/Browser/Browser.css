@@ -76,7 +76,7 @@
         & > .button-panel {
           width: 100%;
           display: flex;
-          justify-content: center;
+          justify-content: flex-end;
 
           & .MuiToggleButton-root.Mui-selected {
             & svg[data-testid='CheckIcon'] {
