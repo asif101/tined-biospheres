@@ -205,7 +205,7 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
             color='error'
             onClick={() => {
               socket.emit('deleteImage', deleteDialogOpen, () => {
-                socket.emit('getNumImages', loggedInVenue, (e, num) => {
+                socket.emit('getNumImages', { loggedInVenue, filters }, (e, num) => {
                   if (e) console.warn(e)
                   else {
                     setNumImages(num)
