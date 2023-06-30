@@ -63,7 +63,7 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
   }
 
   const refreshNumImages = (filterOverride) => {
-    socket.emit('getNumImages', { loggedInVenue, filters: filterOverride }, (e, num) => {
+    socket.emit('getNumImages', { loggedInVenue, filters: filterOverride ?? filters }, (e, num) => {
       if (e) console.warn(e)
       else setNumImages(num)
     })
