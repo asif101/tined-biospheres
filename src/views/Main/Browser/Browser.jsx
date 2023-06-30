@@ -142,8 +142,20 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
               socket.emit('updateModeration', imageId, moderationState, (e) => {
                 if (e) console.warn(e)
                 else {
-                  refreshImages()
-                  refreshNumImages()
+                  if (moderationState === 2) {
+                    socket.emit('updateFeatured', imageId, false, (e) => {
+                      if (e) console.warn(e)
+                      else {
+                        onModerationChange()
+                        refreshImages()
+                        refreshNumImages()
+                      }
+                    })
+                  } else {
+                    onModerationChange()
+                    refreshImages()
+                    refreshNumImages()
+                  }
                 }
               })
             }}
@@ -151,9 +163,20 @@ export default function Browser({ loggedInVenue, s3BucketNames, onModerationChan
               socket.emit('updateFeatured', imageId, featured, (e) => {
                 if (e) console.warn(e)
                 else {
-                  onModerationChange()
-                  refreshImages()
-                  refreshNumImages()
+                  if (featured) {
+                    socket.emit('updateModeration', imageId, 1, (e) => {
+                      if (e) console.warn(e)
+                      else {
+                        onModerationChange()
+                        refreshImages()
+                        refreshNumImages()
+                      }
+                    })
+                  } else {
+                    onModerationChange()
+                    refreshImages()
+                    refreshNumImages()
+                  }
                 }
               })
             }}
