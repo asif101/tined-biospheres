@@ -44,7 +44,7 @@ app.post('/latestImages', upload.none(), (req, res) => {
     const validNumImages = Number.isInteger(parsedNumImages)
     if (req.body.numImages && !validNumImages) console.warn('numImages is invalid. using default')
     const numImages = validNumImages ? parsedNumImages : 49
-    getLatestImages(numImages, req.body.venue, 0.3)
+    getLatestImages(numImages, req.body.venue, 0.5, 0.5)
       .then((ids) => res.status(200).send(ids))
       .catch((e) => res.status(500).send(e))
   }

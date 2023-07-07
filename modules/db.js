@@ -1,6 +1,5 @@
 import pg from 'pg'
-// import format from 'pg-format'
-// import { venues } from '../src/utils/enum.js'
+// import { venues } from '../src/utils/enum'
 
 const pool = new pg.Pool({
   host: process.env.POSTGRES_HOST,
@@ -134,28 +133,27 @@ export async function getNextUnmoderatedImageMetadata(loggedInVenue) {
 }
 
 //get latest images, split between global and venue
-export async function getLatestImages(numImages, venue, venueSplit) {
+export async function getLatestImages(numImages, venue, featuredSplit, venueSplit) {
   try {
-    let desiredNumVenueImages = Math.round(numImages * venueSplit)
-    let desiredNumGlobalImages = numImages - desiredNumVenueImages
-    const numGlobalImagesQuery = await pool.query(
-      `select count (*) from metadata where venue!='${venue}' and moderation_state=1`
+    const desiredNumVenueImages = Math.round(numImages * featuredSplit * venueSplit)
+    const desiredNumOtherVenueImages = Math.round(numImages * featuredSplit * (1 - venueSplit))
+    const recentVenueImages100 = await pool.query(
+      `select * from metadata where venue='${venue}' and moderation_state=1 order by created_timestamp desc limit 100`
     )
-    const numGlobalImages = numGlobalImagesQuery.rows[0].count
-    const isEnoughGlobalImages = numGlobalImages >= desiredNumGlobalImages
-    if (!isEnoughGlobalImages) {
-      desiredNumVenueImages = desiredNumVenueImages + (desiredNumGlobalImages - numGlobalImages)
-      desiredNumGlobalImages = numGlobalImages
-    }
-    const venueImages = await pool.query(
-      `select * from metadata where venue='${venue}' and moderation_state=1 order by created_timestamp desc limit ${desiredNumVenueImages}`
+    const recentOtherVenueImages100 = await pool.query(
+      `select * from metadata where venue!='${venue}' and moderation_state=1 order by created_timestamp desc limit 100`
     )
-    desiredNumGlobalImages = numImages - venueImages.rows.length
-    const globalImages = await pool.query(
-      `select * from metadata where venue!='${venue}' and moderation_state=1 order by created_timestamp desc limit ${desiredNumGlobalImages}`
+    const randomizedRecentVenueImages = getMultipleRandom(recentVenueImages100.rows, desiredNumVenueImages)
+    const randomizedRecentOtherVenueImages = getMultipleRandom(
+      recentOtherVenueImages100.rows,
+      desiredNumOtherVenueImages
     )
-    // console.log(venueImages.rows.length, globalImages.rows.length)
-    return [...venueImages.rows, ...globalImages.rows]
+    const numFeaturedImages = numImages - randomizedRecentVenueImages.length - randomizedRecentOtherVenueImages.length
+    const venueAndOtherVenueImages = [...randomizedRecentVenueImages, ...randomizedRecentOtherVenueImages]
+    const featuredImages = await pool.query(
+      `select * from metadata where featured=true and moderation_state=1 order by created_timestamp desc limit ${numFeaturedImages}`
+    )
+    return [...venueAndOtherVenueImages, ...featuredImages.rows]
   } catch (error) {
     console.log(error)
     throw error
@@ -205,4 +203,8 @@ const statusClauseLookup = {
   Approved: 'moderation_state=1',
   Denied: 'moderation_state=2',
   Unmoderated: 'moderation_state=0',
+}
+
+function getMultipleRandom(arr, num) {
+  return [...arr].sort(() => 0.5 - Math.random()).slice(0, num)
 }
