@@ -1,5 +1,5 @@
 import pg from 'pg'
-// import { venues } from '../src/utils/enum'
+import { venues } from '../src/utils/enum.js'
 
 const pool = new pg.Pool({
   host: process.env.POSTGRES_HOST,
@@ -135,24 +135,26 @@ export async function getNextUnmoderatedImageMetadata(loggedInVenue) {
 //get latest images, split between global and venue
 export async function getLatestImages(numImages, venue, featuredSplit, venueSplit) {
   try {
+    const venueList = Object.keys(venues)
+    const numVenues = venueList.length
     const desiredNumVenueImages = Math.round(numImages * featuredSplit * venueSplit)
-    const desiredNumOtherVenueImages = Math.round(numImages * featuredSplit * (1 - venueSplit))
     const recentVenueImages100 = await pool.query(
       `select * from metadata where venue='${venue}' and moderation_state=1 order by created_timestamp desc limit 100`
     )
-    const recentOtherVenueImages100 = await pool.query(
-      `select * from metadata where venue!='${venue}' and moderation_state=1 order by created_timestamp desc limit 100`
-    )
     const randomizedRecentVenueImages = getMultipleRandom(recentVenueImages100.rows, desiredNumVenueImages)
-    const randomizedRecentOtherVenueImages = getMultipleRandom(
-      recentOtherVenueImages100.rows,
-      desiredNumOtherVenueImages
-    )
-    const numFeaturedImages = numImages - randomizedRecentVenueImages.length - randomizedRecentOtherVenueImages.length
-    const venueAndOtherVenueImages = [...randomizedRecentVenueImages, ...randomizedRecentOtherVenueImages]
-    const featuredImages = await pool.query(
-      `select * from metadata where featured=true and moderation_state=1`
-    )
+    const desiredNumOtherVenueImages = Math.round((numImages * featuredSplit * (1 - venueSplit)) / numVenues)
+    const otherVenueList = venueList.filter((x) => x !== venue)
+    const otherVenueImages = []
+    for await (const otherVenue of otherVenueList) {
+      const recentOtherVenueImages100 = await pool.query(
+        `select * from metadata where venue!='${otherVenue}' and moderation_state=1 order by created_timestamp desc limit 100`
+      )
+      otherVenueImages.push(...getMultipleRandom(recentOtherVenueImages100.rows, desiredNumOtherVenueImages))
+    }
+
+    const numFeaturedImages = numImages - randomizedRecentVenueImages.length - otherVenueImages.length
+    const venueAndOtherVenueImages = [...randomizedRecentVenueImages, ...otherVenueImages]
+    const featuredImages = await pool.query(`select * from metadata where featured=true and moderation_state=1`)
     const randomFeaturedImages = getMultipleRandom(featuredImages.rows, numFeaturedImages)
     return [...venueAndOtherVenueImages, ...randomFeaturedImages]
   } catch (error) {
