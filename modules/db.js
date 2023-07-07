@@ -151,9 +151,10 @@ export async function getLatestImages(numImages, venue, featuredSplit, venueSpli
     const numFeaturedImages = numImages - randomizedRecentVenueImages.length - randomizedRecentOtherVenueImages.length
     const venueAndOtherVenueImages = [...randomizedRecentVenueImages, ...randomizedRecentOtherVenueImages]
     const featuredImages = await pool.query(
-      `select * from metadata where featured=true and moderation_state=1 order by created_timestamp desc limit ${numFeaturedImages}`
+      `select * from metadata where featured=true and moderation_state=1`
     )
-    return [...venueAndOtherVenueImages, ...featuredImages.rows]
+    const randomFeaturedImages = getMultipleRandom(featuredImages.rows, numFeaturedImages)
+    return [...venueAndOtherVenueImages, ...randomFeaturedImages]
   } catch (error) {
     console.log(error)
     throw error
