@@ -2,7 +2,9 @@ export const venues = {
     SYDNEY: 'Sydney',
     LONDON: 'London',
     LA: 'Los Angeles',
-    NEW_YORK: 'New York'
+    NEW_YORK: 'New York',
+    NAPLES: 'Naples',
+    SINGAPORE: 'Singapore'
 }
 
 export const mainViews = {
