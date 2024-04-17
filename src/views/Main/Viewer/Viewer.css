@@ -1,0 +1,9 @@
+.viewer {
+    display: flex;
+    flex-wrap: wrap;
+    .image {
+        .img {
+            width: 100px;
+        }
+    }
+}

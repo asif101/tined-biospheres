@@ -6,6 +6,7 @@ import Browser from './Browser/Browser'
 import Moderate from './Moderate/Moderate'
 import './Main.css'
 import { useSocket } from '../../utils/socketContext'
+// import Viewer from './Viewer/Viewer'
 
 export default function Main({ loggedInVenue, s3BucketNames }) {
   const socket = useSocket()
@@ -50,6 +51,7 @@ export default function Main({ loggedInVenue, s3BucketNames }) {
             s3BucketNames={s3BucketNames}
             onModerationChange={refreshUnmoderatedImageCount}
           />
+          // <Viewer s3BucketNames={s3BucketNames} />
         )}
         {mainView === mainViews.UPLOAD_TESTER && <Upload onUpload={refreshUnmoderatedImageCount} />}
       </div>
