@@ -16,6 +16,7 @@ import {
   getCredentialsFromUsername,
   setFeaturedState,
   unapproveAllPendingImages,
+  getVariedImages,
 } from './modules/db.js'
 import { deleteFromS3, uploadToS3 } from './modules/s3.js'
 import { makeThumbnail } from './modules/image.js'
@@ -53,6 +54,27 @@ app.post('/latestImages', upload.none(), (req, res) => {
     if (!req.body) return 'no request body'
     if (req.body?.token !== process.env.API_TOKEN) return 'invalid token'
     if (!Object.values(venues).includes(req.body.venue)) return 'Venue is not valid'
+    return false
+  }
+})
+
+app.post('/variedImages', upload.none(), (req, res) => {
+  const e = validateRequest(req)
+  if (e) {
+    console.log('rejected latestImages POST request with reason:', e)
+    res.status(400).send(e)
+  } else {
+    const parsedNumImages = parseInt(req.body.numImages)
+    const validNumImages = Number.isInteger(parsedNumImages)
+    if (req.body.numImages && !validNumImages) console.warn('numImages is invalid. using default')
+    const numImages = validNumImages ? parsedNumImages : 49
+    getVariedImages(numImages)
+      .then((ids) => res.status(200).send(ids))
+      .catch((e) => res.status(500).send(e))
+  }
+  function validateRequest(req) {
+    if (!req.body) return 'no request body'
+    if (req.body?.token !== process.env.API_TOKEN) return 'invalid token'
     return false
   }
 })

@@ -166,7 +166,7 @@ export async function getLatestImages(numImages, venue, featuredSplit, venueSpli
     const otherVenueImages = []
     for await (const otherVenue of otherVenueList) {
       const recentOtherVenueImages100 = await pool.query(
-        `select * from metadata where venue!='${otherVenue}' and moderation_state=1 order by created_timestamp desc limit 100`
+        `select * from metadata where venue!='${venues[otherVenue]}' and moderation_state=1 order by created_timestamp desc limit 100`
       )
       otherVenueImages.push(...getMultipleRandom(recentOtherVenueImages100.rows, desiredNumOtherVenueImages))
     }
@@ -176,6 +176,39 @@ export async function getLatestImages(numImages, venue, featuredSplit, venueSpli
     const featuredImages = await pool.query(`select * from metadata where featured=true and moderation_state=1`)
     const randomFeaturedImages = getMultipleRandom(featuredImages.rows, numFeaturedImages)
     return [...venueAndOtherVenueImages, ...randomFeaturedImages]
+  } catch (error) {
+    console.log(error)
+    throw error
+  }
+}
+
+export async function getVariedImages(numImages) {
+  try {
+    const venueList = Object.keys(venues)
+    const numVenues = venueList.length
+    const desiredNumImagesPerVenue = Math.round(numImages / numVenues)
+    const images = []
+    for await (const venue of venueList) {
+      const featuredImagesInVenue = await pool.query(
+        `select * from metadata 
+        where venue='${venues[venue]}' 
+        and featured=true 
+        order by random() 
+        limit ${desiredNumImagesPerVenue}`
+      )
+      images.push(...featuredImagesInVenue.rows)
+    }
+
+    if (images.length < numImages) {
+      const featuredImages = await pool.query(
+        `select * from metadata 
+        where featured=true 
+        order by random() 
+        limit ${numImages - images.length}`
+      )
+      images.push(...featuredImages.rows)
+    }
+    return images
   } catch (error) {
     console.log(error)
     throw error
