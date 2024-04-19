@@ -15,6 +15,7 @@ import {
   getLatestImages,
   getCredentialsFromUsername,
   setFeaturedState,
+  unapproveAllPendingImages,
 } from './modules/db.js'
 import { deleteFromS3, uploadToS3 } from './modules/s3.js'
 import { makeThumbnail } from './modules/image.js'
@@ -136,6 +137,11 @@ io.on('connection', (socket) => {
   })
   socket.on('updateModeration', (imageId, moderationState, callback) => {
     setModeration(imageId, moderationState)
+      .then(() => callback(false))
+      .catch((e) => callback(e))
+  })
+  socket.on('unapproveAllPending', (loggedInVenue, callback) => {
+    unapproveAllPendingImages(loggedInVenue)
       .then(() => callback(false))
       .catch((e) => callback(e))
   })

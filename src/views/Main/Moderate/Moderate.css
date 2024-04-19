@@ -69,6 +69,17 @@
           }
         }
       }
+
+      & > .button-panel {
+        display: flex;
+        flex-direction: column;
+
+        & > .unapprove-all {
+          width: 184px;
+          margin-top: 15px;
+        }
+
+      }
     }
   }
 

@@ -3,7 +3,17 @@ import { DateTime } from 'luxon'
 import { getImageUrl } from '../../../utils/general'
 import { useSocket } from '../../../utils/socketContext'
 import './Moderate.css'
-import { CircularProgress, ToggleButton, ToggleButtonGroup } from '@mui/material'
+import {
+  CircularProgress,
+  ToggleButton,
+  ToggleButtonGroup,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  DialogTitle,
+} from '@mui/material'
 import { Check, DoNotDisturbAlt, Inbox } from '@mui/icons-material'
 import { AnimatePresence, motion } from 'framer-motion'
 
@@ -12,6 +22,7 @@ export default function Moderate({ loggedInVenue, s3BucketNames, onModerationCha
 
   const [metadata, setMetadata] = useState()
   const [imageLoaded, setImageLoaded] = useState(false)
+  const [showUnapproveConfirmDialog, setShowUnapproveConfirmDialog] = useState(false)
 
   useEffect(() => {
     getNextMetadata()
@@ -72,7 +83,9 @@ export default function Moderate({ loggedInVenue, s3BucketNames, onModerationCha
                 </div>
                 <div className='info-item'>
                   <span className='label'>Drawing Prompt</span>
-                  <span className='value'>{metadata.drawing_prompt !== '' ? metadata.drawing_prompt : 'None Provided'}</span>
+                  <span className='value'>
+                    {metadata.drawing_prompt !== '' ? metadata.drawing_prompt : 'None Provided'}
+                  </span>
                 </div>
               </div>
               <div className='button-panel'>
@@ -83,7 +96,6 @@ export default function Moderate({ loggedInVenue, s3BucketNames, onModerationCha
                     socket.emit('updateModeration', metadata.image_id, v, (e) => {
                       if (e) console.warn(e)
                       else {
-                        console.log(3)
                         onModerationChange()
                         getNextMetadata(true)
                       }
@@ -97,6 +109,37 @@ export default function Moderate({ loggedInVenue, s3BucketNames, onModerationCha
                     <DoNotDisturbAlt sx={{ fontSize: 60, fill: '#dc3d32' }} />
                   </ToggleButton>
                 </ToggleButtonGroup>
+                <Button
+                  variant='outlined'
+                  color='warning'
+                  className='unapprove-all'
+                  onClick={() => setShowUnapproveConfirmDialog(true)}
+                >
+                  Unapprove All
+                </Button>
+                <Dialog open={showUnapproveConfirmDialog} onClose={() => setShowUnapproveConfirmDialog(false)}>
+                  <DialogTitle>Unapprove All Pending Images</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText>This will mark all pending images in the queue as unapproved.</DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={() => setShowUnapproveConfirmDialog(false)}>Cancel</Button>
+                    <Button
+                      color='warning'
+                      onClick={() => {
+                        socket.emit('unapproveAllPending', loggedInVenue, (e) => {
+                          if (e) console.warn(e)
+                          else {
+                            onModerationChange()
+                            setShowUnapproveConfirmDialog(false)
+                          }
+                        })
+                      }}
+                    >
+                      Confirm
+                    </Button>
+                  </DialogActions>
+                </Dialog>
               </div>
             </div>
           </motion.div>
