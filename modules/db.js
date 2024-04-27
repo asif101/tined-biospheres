@@ -132,18 +132,13 @@ export async function getNextUnmoderatedImageMetadata(loggedInVenue) {
   }
 }
 
-//for testing, it only returns the images it will unapprove for now
 export async function unapproveAllPendingImages(loggedInVenue) {
   try {
     const res = await pool.query(
-      `select * from metadata where moderation_state=0 ${
+      `update metadata set moderation_state=2 where moderation_state=0 ${
         loggedInVenue === 'Global' ? '' : `and venue='${loggedInVenue}'`
       }`
     )
-    // const updateQuery = `update metadata set moderation_state=2 where moderation_state=0 ${
-    //   loggedInVenue === 'Global' ? '' : `and venue='${loggedInVenue}'`
-    // }`
-    console.log(res.rows.length)
     return res.rows
   } catch (error) {
     console.log(error)
