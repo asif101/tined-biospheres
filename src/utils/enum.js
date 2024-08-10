@@ -5,7 +5,8 @@ export const venues = {
     NEW_YORK: 'New York',
     NAPLES: 'Naples',
     SINGAPORE: 'Singapore',
-    PARIS: 'Paris'
+    PARIS: 'Paris',
+    BANGKOK: 'Bangkok'
 }
 
 export const mainViews = {
